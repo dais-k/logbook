@@ -7,6 +7,7 @@ import java.io.StringReader;
 
 import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -17,6 +18,14 @@ import javax.json.JsonValue;
  *
  */
 public class JsonUtils {
+
+    public static JsonArray toJsonArray(int[] array) {
+        JsonArrayBuilder json = Json.createArrayBuilder();
+        for (int v : array) {
+            json.add(v);
+        }
+        return json.build();
+    }
 
     public static int[] toCompulsionIntArray(JsonArray jsonArray) {
         if (jsonArray == null)

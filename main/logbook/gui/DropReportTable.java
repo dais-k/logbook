@@ -143,10 +143,10 @@ public final class DropReportTable extends AbstractTableDialog {
                     List<ShipDto> ships = detail.getDock().getShips();
                     if (detail.isCombined()) {
                         List<ShipDto> shipsCombined = detail.getDockCombined().getShips();
-                        data = new DeckBuilder().getDeckBuilderURL(ships, shipsCombined);
+                        data = DeckBuilder.toDeckBuilderURL(ships, shipsCombined);
                     }
                     else {
-                        data = new DeckBuilder().getDeckBuilderURL(ships);
+                        data = DeckBuilder.toDeckBuilderURL(ships);
                     }
                     if (GlobalContext.getState() == 1) {
                         Clipboard clipboard = new Clipboard(Display.getDefault());

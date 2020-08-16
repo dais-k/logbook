@@ -1198,32 +1198,7 @@ public final class ApplicationMain extends WindowBase {
         final MenuItem rootCopyDeckBuilder = new MenuItem(this.getPopupMenu(), SWT.CASCADE);
         rootCopyDeckBuilder.setText("デッキビルダー");
         Menu copyDeckBuilderMenu = new Menu(rootCopyDeckBuilder);
-        /*
-        final MenuItem copyDeckBuilderFormat = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyDeckBuilderFormat.setText("フォーマットをクリップボードにコピー");
-        
-        copyDeckBuilderFormat.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean[] isUseCopyDeckBuilder = {
-                        AppConfig.get().isUseCopyDeckBuilder1(),
-                        AppConfig.get().isUseCopyDeckBuilder2(),
-                        AppConfig.get().isUseCopyDeckBuilder3(),
-                        AppConfig.get().isUseCopyDeckBuilder4() };
-                if (GlobalContext.getState() == 1) {
-                    Clipboard clipboard = new Clipboard(Display.getDefault());
-                    clipboard.setContents(new Object[] { new DeckBuilder().getDeckBuilderFormat(isUseCopyDeckBuilder) },
-                            new Transfer[] { TextTransfer.getInstance() });
-                } else {
-                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
-                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
-                    mes.setText(AppConstants.TITLEBAR_TEXT);
-                    mes.setMessage("母港情報が不足しています。母港画面に遷移してデータを読み込んでください。");
-                    mes.open();
-                    shell.dispose();
-                }
-            }
-        });*/
+
         final MenuItem copyDeckBuilderURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
         copyDeckBuilderURL.setText("編成をコピー(デッキビルダーURL)");
 
@@ -1237,7 +1212,7 @@ public final class ApplicationMain extends WindowBase {
                         AppConfig.get().isUseCopyDeckBuilder4() };
                 if (GlobalContext.getState() == 1) {
                     Clipboard clipboard = new Clipboard(Display.getDefault());
-                    clipboard.setContents(new Object[] { new DeckBuilder().getDeckBuilderURL(isUseCopyDeckBuilder) },
+                    clipboard.setContents(new Object[] { DeckBuilder.toDeckBuilderURL(isUseCopyDeckBuilder) },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1265,7 +1240,36 @@ public final class ApplicationMain extends WindowBase {
                     boolean isUseEventAirbase = AppConfig.get().isUseEventAirbase();
                     Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(
-                            new Object[] { new DeckBuilder().getKcToolsBuilderURL(isUseCopyDeckBuilder,
+                            new Object[] { DeckBuilder.toKcToolsBuilderURL(isUseCopyDeckBuilder,
+                                    isUseEventAirbase) },
+                            new Transfer[] { TextTransfer.getInstance() });
+                }
+                else {
+                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                    mes.setText(AppConstants.TITLEBAR_TEXT);
+                    mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                    mes.open();
+                    shell.dispose();
+                }
+            }
+        });
+        final MenuItem copyJervisORURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
+        copyJervisORURL.setText("編成をコピー(作戦室JervisOR URL)");
+
+        copyJervisORURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean[] isUseCopyDeckBuilder = {
+                        AppConfig.get().isUseCopyDeckBuilder1(),
+                        AppConfig.get().isUseCopyDeckBuilder2(),
+                        AppConfig.get().isUseCopyDeckBuilder3(),
+                        AppConfig.get().isUseCopyDeckBuilder4() };
+                if (GlobalContext.getState() == 1) {
+                    boolean isUseEventAirbase = AppConfig.get().isUseEventAirbase();
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                    clipboard.setContents(
+                            new Object[] { DeckBuilder.toJervisORBuilderURL(isUseCopyDeckBuilder,
                                     isUseEventAirbase) },
                             new Transfer[] { TextTransfer.getInstance() });
                 }

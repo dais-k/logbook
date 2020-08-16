@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
@@ -30,72 +31,32 @@ public class DeckBuilder {
     /**
      * 艦隊シミュレーター＆デッキビルダーのフォーマットバージョン
      */
-    public final String DECKBUILDER_FORMAT_VERSION = "4";
+    private static final int DECKBUILDER_FORMAT_VERSION = 4;
 
     /**
      * 制空権シミュレータのフォーマットバージョン
      */
-    public final String KC_TOOLS_BUILDER_FORMAT_VERSION = "4.2";
+    private static final double KC_TOOLS_FORMAT_VERSION = 4.2;
+
+    /**
+     * JervisORののフォーマットバージョン
+     */
+    private static final int JERVIS_OR_FORMAT_VERSION = 1;
 
     /**
      * 艦隊シミュレーター＆デッキビルダーのURL
      */
-    public final String DECKBUILDER_URL = "http://kancolle-calc.net/deckbuilder.html";
+    private static final String DECKBUILDER_URL = "http://kancolle-calc.net/deckbuilder.html";
 
     /**
      * 制空権シミュレータのURL
      */
-    public final String KC_TOOLS_BUILDER_URL = "https://noro6.github.io/kcTools/";
+    private static final String KC_TOOLS_URL = "https://noro6.github.io/kcTools/";
 
     /**
-     * 艦隊シミュレーター＆デッキビルダーのURLにつける語尾
+     * JervisORのURL
      */
-    public final String SUFFIX = "?predeck=";
-
-    /**
-     * 艦隊シミュレーター＆デッキビルダーのフォーマットバージョンを返します
-     *
-     * @return fORMAT_VERSION
-     */
-    public String getDeckbuilderFormatVersion() {
-        return this.DECKBUILDER_FORMAT_VERSION;
-    }
-
-    /**
-     * 制空権シミュレータのフォーマットバージョンを返します
-     *
-     * @return fORMAT_VERSION
-     */
-    public String getKcToolsBuilderFormatVersion() {
-        return this.KC_TOOLS_BUILDER_FORMAT_VERSION;
-    }
-
-    /**
-     * 艦隊シミュレーター＆デッキビルダーのURLを返します
-     *
-     * @return URL
-     */
-    public String getDeckbuilderURL() {
-        return this.DECKBUILDER_URL;
-    }
-
-    /**
-     * 制空権シミュレータのURLを返します
-     *
-     * @return URL
-     */
-    public String getKcToolsBuilderURL() {
-        return this.KC_TOOLS_BUILDER_URL;
-    }
-
-    /**
-     * 艦隊シミュレーター＆デッキビルダーのURLにつける語尾を返します
-     *
-     * @return Suffix
-     */
-    public String getSuffix() {
-        return this.SUFFIX;
-    }
+    private static final String JERVIS_OR_URL = "https://kcjervis.github.io/jervis/";
 
     /**
      * 艦載機厨氏の艦隊シミュレーター＆デッキビルダーのフォーマットを返します
@@ -104,9 +65,9 @@ public class DeckBuilder {
      * @param needsUsedDock どの艦隊のデータを用いるか[第一艦隊,第二艦隊,第三艦隊,第四艦隊]
      * @return format フォーマット
      */
-    public String getDeckBuilderFormat(boolean[] needsUsedDock) {
+    public static String toDeckBuilderFormat(boolean[] needsUsedDock) {
         JsonObjectBuilder deck = Json.createObjectBuilder();
-        deck.add("version", this.DECKBUILDER_FORMAT_VERSION);
+        deck.add("version", DECKBUILDER_FORMAT_VERSION);
         try {
             IntStream.rangeClosed(1, GlobalContext.getBasicInfo().getDeckCount())
                     .filter(dockId -> needsUsedDock[dockId - 1])
@@ -174,9 +135,9 @@ public class DeckBuilder {
      * @return format フォーマット
      */
     @SuppressWarnings("unchecked")
-    public String getDeckBuilderFormat(List<ShipDto>... fleets) {
+    public static String toDeckBuilderFormat(List<ShipDto>... fleets) {
         JsonObjectBuilder deck = Json.createObjectBuilder();
-        deck.add("version", this.DECKBUILDER_FORMAT_VERSION);
+        deck.add("version", DECKBUILDER_FORMAT_VERSION);
         try {
             IntStream.rangeClosed(1, fleets.length)
                     .boxed()
@@ -245,9 +206,9 @@ public class DeckBuilder {
      *
      * @return format フォーマット
      */
-    public String getDeckBuilderFormat() {
+    public static String toDeckBuilderFormat() {
         boolean[] b = { true, true, true, true };
-        return this.getDeckBuilderFormat(b);
+        return toDeckBuilderFormat(b);
     }
 
     /**
@@ -258,10 +219,10 @@ public class DeckBuilder {
      * @return url URL
      */
     @SuppressWarnings("unchecked")
-    public String getDeckBuilderURL(List<ShipDto>... fleets) {
-        Optional<String> formatOpt = Optional.ofNullable(this.getDeckBuilderFormat(fleets));
+    public static String toDeckBuilderURL(List<ShipDto>... fleets) {
+        Optional<String> formatOpt = Optional.ofNullable(toDeckBuilderFormat(fleets));
         if (formatOpt.isPresent()) {
-            return this.DECKBUILDER_URL + this.SUFFIX + formatOpt.get();
+            return DECKBUILDER_URL + "?predeck=" + formatOpt.get();
         }
         else {
             return null;
@@ -275,10 +236,10 @@ public class DeckBuilder {
      * @param needsUsedDock どの艦隊のデータを用いるか[第一艦隊,第二艦隊,第三艦隊,第四艦隊]
      * @return url URL
      */
-    public String getDeckBuilderURL(boolean[] needsUsedDock) {
-        Optional<String> formatOpt = Optional.ofNullable(this.getDeckBuilderFormat(needsUsedDock));
+    public static String toDeckBuilderURL(boolean[] needsUsedDock) {
+        Optional<String> formatOpt = Optional.ofNullable(toDeckBuilderFormat(needsUsedDock));
         if (formatOpt.isPresent()) {
-            return this.DECKBUILDER_URL + this.SUFFIX + formatOpt.get();
+            return DECKBUILDER_URL + "?predeck=" + formatOpt.get();
         }
         else {
             return null;
@@ -291,9 +252,9 @@ public class DeckBuilder {
      *
      * @return url URL
      */
-    public String getDeckBuilderURL() {
+    public static String toDeckBuilderURL() {
         boolean[] b = { true, true, true, true };
-        return this.getDeckBuilderURL(b);
+        return toDeckBuilderURL(b);
     }
 
     private static String encodeURIComponent(String s) {
@@ -310,20 +271,20 @@ public class DeckBuilder {
         }
     }
 
-    public String getKcToolsBuilderURL(boolean[] needsUsedDock, boolean isEvent) {
-        Optional<String> formatOpt = Optional.ofNullable(this.getKcToolsBuilderFormat(needsUsedDock, isEvent));
+    public static String toKcToolsBuilderURL(boolean[] needsUsedDock, boolean isEvent) {
+        Optional<String> formatOpt = Optional.ofNullable(toKcToolsBuilderFormat(needsUsedDock, isEvent));
         if (formatOpt.isPresent()) {
-            return this.KC_TOOLS_BUILDER_URL + this.SUFFIX + formatOpt.get();
+            return KC_TOOLS_URL + "?predeck=" + formatOpt.get();
         }
         else {
             return null;
         }
     }
 
-    public String getKcToolsBuilderFormat(boolean[] needsUsedDock, boolean isEvent) {
-        JsonObject deck = JsonUtils.fromString(this.getDeckBuilderFormat(needsUsedDock));
+    public static String toKcToolsBuilderFormat(boolean[] needsUsedDock, boolean isEvent) {
+        JsonObject deck = JsonUtils.fromString(toDeckBuilderFormat(needsUsedDock));
         JsonObjectBuilder json = Json.createObjectBuilder();
-        json.add("version", this.KC_TOOLS_BUILDER_FORMAT_VERSION);
+        json.add("version", KC_TOOLS_FORMAT_VERSION);
         for (int i = 1; i <= 4; i++) {
             if (deck.containsKey("f" + i)) {
                 json.add("f" + i, deck.getJsonObject("f" + i));
@@ -352,6 +313,165 @@ public class DeckBuilder {
                 });
             }
         });
+        return json.build().toString();
+    }
+
+    public static String toJervisORBuilderURL(boolean[] needsUsedDock, boolean isEvent) {
+        Optional<String> formatOpt = Optional.ofNullable(toJervisORBuilderFormat(needsUsedDock, isEvent));
+        if (formatOpt.isPresent()) {
+            return JERVIS_OR_URL + "?operation-json=" + formatOpt.get();
+        }
+        else {
+            return null;
+        }
+    }
+
+    private static JsonArrayBuilder getEmptyLandBaseJervisORBuilderFormat() {
+        JsonArrayBuilder landBaseJson = Json.createArrayBuilder();
+        for (int aircorpId = 1; aircorpId <= 3; aircorpId++) {
+            JsonObjectBuilder aircorpJson = Json.createObjectBuilder();
+            JsonArrayBuilder squadronJson = Json.createArrayBuilder();
+            for (int squadronId = 1; squadronId <= 4; squadronId++) {
+                squadronJson.addNull();
+            }
+            aircorpJson.add("slots", JsonUtils.toJsonArray(new int[] { 18, 18, 18, 18 }))
+                    .add("equipments", squadronJson);
+            landBaseJson.add(aircorpJson);
+        }
+        return landBaseJson;
+    }
+
+    private static int toInternalProficiency(int alv) {
+        switch (alv) {
+            case 7: return 100;
+            case 6: return 85;
+            case 5: return 70;
+            case 4: return 55;
+            case 3: return 40;
+            case 2: return 25;
+            case 1: return 10;
+        }
+        return 0;
+    }
+
+    public static String toJervisORBuilderFormat(boolean[] needsUsedDock, boolean isEvent) {
+        JsonObjectBuilder json = Json.createObjectBuilder()
+                .add("version", JERVIS_OR_FORMAT_VERSION)
+                .add("name", "")
+                .add("description", "")
+                .add("hqLevel", GlobalContext.hqLevel())
+                .add("side", "Player")
+                .add("fleetType", "Single");
+        JsonArrayBuilder fleetJson = Json.createArrayBuilder();
+        for (int dockId = 1; dockId <= 4; dockId++) {
+            List<ShipDto> ships = GlobalContext.getDock(String.valueOf(dockId)).getShips();
+            if (dockId <= GlobalContext.getBasicInfo().getDeckCount() && Objects.nonNull(ships)
+                    && needsUsedDock[dockId - 1]) {
+                JsonArrayBuilder shipJson = Json.createArrayBuilder();
+                for (int shipId = 0; shipId < Math.min(ships.size(), 7); shipId++) {
+                    ShipDto ship = ships.get(shipId);
+                    if (Objects.nonNull(ship)) {
+                        List<ItemDto> items = ship.getItem2();
+                        JsonArrayBuilder itemJson = Json.createArrayBuilder();
+                        for (int itemId = 0; itemId < ship.getSlotNum(); itemId++) {
+                            ItemDto item = items.get(itemId);
+                            if (Objects.nonNull(item)) {
+                                itemJson.add(Json.createObjectBuilder()
+                                        .add("masterId", item.getSlotitemId())
+                                        .add("improvement", item.getLevel())
+                                        .add("proficiency", toInternalProficiency(item.getAlv())));
+                            }
+                            else {
+                                itemJson.addNull();
+                            }
+                        }
+                        ItemDto item = ship.getSlotExItem();
+                        if (Objects.nonNull(item)) {
+                            itemJson.add(Json.createObjectBuilder()
+                                    .add("masterId", item.getSlotitemId())
+                                    .add("improvement", item.getLevel())
+                                    .add("proficiency", toInternalProficiency(item.getAlv())));
+                        }
+                        else {
+                            itemJson.addNull();
+                        }
+                        JsonObjectBuilder increasedJson = Json.createObjectBuilder();
+                        int hp = ship.getMaxhp() - ship.getShipInfo().getParam().getHP() - ship.getMarriedHpBonus();
+                        if (hp > 0) {
+                            increasedJson.add("hp", hp);
+                        }
+                        int lucky = ship.getLucky() - ship.getShipInfo().getParam().getLucky();
+                        if (lucky > 0) {
+                            increasedJson.add("luck", lucky);
+                        }
+                        // 対潜は装備ボーナスのせいで取れない
+                        shipJson.add(Json.createObjectBuilder()
+                                .add("masterId", ship.getShipId())
+                                .add("level", ship.getLv())
+                                .add("slots", JsonUtils.toJsonArray(ship.getMaxeq()))
+                                .add("equipments", itemJson)
+                                .add("increased", increasedJson));
+                    }
+                    else {
+                        shipJson.addNull();
+                    }
+                }
+                fleetJson.add(Json.createObjectBuilder()
+                        .add("ships", shipJson));
+            }
+            else {
+                JsonArrayBuilder array = Json.createArrayBuilder();
+                for (int shipId = 0; shipId < 6; shipId++) {
+                    array.addNull();
+                }
+                fleetJson.add(Json.createObjectBuilder()
+                        .add("ships", array));
+            }
+        }
+        json.add("fleets", fleetJson);
+
+        AirbaseDto airbase = GlobalContext.getAirbase();
+        int area = Objects.nonNull(airbase)
+                ? (isEvent ? airbase.get().keySet().stream().filter(a -> a >= 22).findFirst().orElse(-1)
+                        : airbase.get().containsKey(6) ? 6 : -1)
+                : -1;
+        if (area > 0) {
+            JsonArrayBuilder landBaseJson = Json.createArrayBuilder();
+            Map<Integer, AirCorpsDto> aircorps = airbase.get().get(area);
+            for (int aircorpId = 1; aircorpId <= 3; aircorpId++) {
+                Map<Integer, SquadronDto> squadrons = aircorps.get(aircorpId).getSquadrons();
+                JsonObjectBuilder aircorpsJson = Json.createObjectBuilder();
+                int[] slots = { 18, 18, 18, 18 };
+                JsonArrayBuilder squadronJson = Json.createArrayBuilder();
+                for (int squadronId = 1; squadronId <= 4; squadronId++) {
+                    if (squadrons.containsKey(squadronId)) {
+                        SquadronDto squadron = squadrons.get(squadronId);
+                        slots[squadronId - 1] = squadron.getMaxCount();
+                        ItemDto item = GlobalContext.getItem(squadron.getSlotid());
+                        if (Objects.nonNull(item)) {
+                            squadronJson.add(Json.createObjectBuilder()
+                                    .add("masterId", item.getSlotitemId())
+                                    .add("improvement", item.getLevel())
+                                    .add("proficiency", toInternalProficiency(item.getAlv())));
+                        }
+                        else {
+                            squadronJson.addNull();
+                        }
+                    }
+                    else {
+                        squadronJson.addNull();
+                    }
+                }
+                aircorpsJson.add("slots", JsonUtils.toJsonArray(slots))
+                        .add("equipments", squadronJson);
+                landBaseJson.add(aircorpsJson);
+            }
+            json.add("landBase", landBaseJson);
+        }
+        else {
+            json.add("landBase", getEmptyLandBaseJervisORBuilderFormat());
+        }
+
         return json.build().toString();
     }
 }

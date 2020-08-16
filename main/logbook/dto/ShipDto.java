@@ -603,4 +603,34 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     public int getSallyArea() {
         return this.sallyArea;
     }
+
+    public int getMarriedHpBonus() {
+        if (this.lv > 99) {
+            int bonus;
+            int hp = this.shipInfo.getParam().getHP();
+            if (hp > 90) {
+                bonus = 9;
+            }
+            else if (hp >= 70) {
+                bonus = 8;
+            }
+            else if (hp >= 50) {
+                bonus = 7;
+            }
+            else if (hp >= 40) {
+                bonus = 6;
+            }
+            else if (hp >= 30) {
+                bonus = 5;
+            }
+            else if (hp >= 7) {
+                bonus = 4;
+            }
+            else {
+                bonus = 3;
+            }
+            return Math.min(bonus, this.shipInfo.getMax().getHP() - hp);
+        }
+        return 0;
+    }
 }
