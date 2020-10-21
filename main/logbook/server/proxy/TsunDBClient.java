@@ -593,6 +593,8 @@ public class TsunDBClient extends Thread {
         int i = 0;
         JsonArrayBuilder result = Json.createArrayBuilder();
         for (ShipDto ship : ships) {
+            List<ItemDto> item2 = ship.getItem2().subList(0, Math.max(ship.getSlotNum(), 4));
+            item2.add(ship.getSlotExItem());
             result.add(Json.createObjectBuilder()
                     .add("id", ship.getShipId())
                     .add("name", ship.getName())
@@ -601,14 +603,15 @@ public class TsunDBClient extends Thread {
                     .add("type", ship.getStype())
                     .add("speed", ship.getParam().getSoku())
                     .add("flee", Objects.nonNull(escaped) ? escaped[i++] : false)
-                    .add("equip", toJsonArray(ship.getItem2().stream().mapToInt(item -> {
-                        return Objects.nonNull(item) ? item.getSlotitemId() : -1;
-                    }).toArray()))
-                    .add("stars", toJsonArray(ship.getItem2().stream().mapToInt(item -> {
+                    .add("equip", toJsonArray(
+                            ship.getItem2().subList(0, Math.max(ship.getSlotNum(), 4)).stream().mapToInt(item -> {
+                                return Objects.nonNull(item) ? item.getSlotitemId() : -1;
+                            }).toArray()))
+                    .add("stars", toJsonArray(item2.stream().mapToInt(item -> {
                         return Objects.nonNull(item) ? item.getLevel() : 0;
                     }).toArray()))
-                    .add("ace", toJsonArray(ship.getItem2().stream().mapToInt(item -> {
-                        return Objects.nonNull(item) ? item.getAlv() : -1;
+                    .add("ace", toJsonArray(item2.stream().mapToInt(item -> {
+                        return Objects.nonNull(item) && item.isPlane() ? item.getAlv() : -1;
                     }).toArray()))
                     .add("exslot",
                             Objects.nonNull(ship.getSlotExItem()) ? ship.getSlotExItem().getSlotitemId() : -1));
