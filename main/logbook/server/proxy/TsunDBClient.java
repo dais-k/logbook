@@ -593,7 +593,7 @@ public class TsunDBClient extends Thread {
         int i = 0;
         JsonArrayBuilder result = Json.createArrayBuilder();
         for (ShipDto ship : ships) {
-            List<ItemDto> item2 = ship.getItem2().subList(0, Math.max(ship.getSlotNum(), 4));
+            List<ItemDto> item2 = new ArrayList<>(ship.getItem2().subList(0, Math.max(ship.getSlotNum(), 4)));
             item2.add(ship.getSlotExItem());
             result.add(Json.createObjectBuilder()
                     .add("id", ship.getShipId())
