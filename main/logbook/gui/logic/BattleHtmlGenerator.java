@@ -642,6 +642,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             String[] text;
             String[][] textClass;
             String[][] damageClass;
+            int type = atack.type;
             if (atack.friendAtack) {
                 origin = friendShips;
                 originHp = friendHp;
@@ -666,16 +667,39 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             }
 
             String HTypeS = "";
+            int offset = 0;
             for (int i = 0; i < atack.damage.length; ++i) {
                 this.begin("tr", null);
 
-                if (i == 0) {
-                    String tooltipText = getHpString(originHp[atack.origin[0]], maxOriginHp[atack.origin[0]]);
+                if (type == 300 || type == 301 || type == 302) {
+                    int count = atack.damage.length;
+                    // 僚艦夜戦突撃
+                    int idx = (type == 300 || type == 302) && (i == 0 || count == 4 && i == 1) ? 1
+                            : (type == 300 && i >= 2 || type == 301 && (i == 0 || count == 4 && i == 1)) ? 2
+                                    : (type == 301 || type == 302) && (i >= 2) ? 3
+                                            : -1;
+
                     this.inline("td", text[0], null);
-                    this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, atack.origin[0]),
-                            textClass[0]);
+                    if (idx > 0) {
+                        String tooltipText = getHpString(originHp[idx], maxOriginHp[idx]);
+                        this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, idx), textClass[0]);
+                    }
+                    else {
+                        this.inline("td", "?.？？？(Lv.???)", textClass[0]);
+                    }
+                }
+                else if (i == 0) {
                     HTypeS = isDay ? atack.getHougekiTypeString(atack.showitem)
                             : atack.getSpecialAttackString(atack.showitem);
+                    // 連合かつ僚艦夜戦突撃のときapi_at_list=0だった悲しみ
+                    offset = origin.length > 6 && HTypeS.equals("僚艦夜戦突撃") ? 6 : 0;
+
+                    String tooltipText = getHpString(originHp[atack.origin[0] + offset],
+                            maxOriginHp[atack.origin[0] + offset]);
+                    this.inline("td", text[0], null);
+                    this.inline("td", "title='" + tooltipText + "'",
+                            this.getShipName(origin, atack.origin[0] + offset),
+                            textClass[0]);
                 }
                 else if ((i == 1) && (HTypeS.equals("ネルソンタッチ"))) {
                     String tooltipText = getHpString(originHp[2], maxOriginHp[2]);
@@ -708,9 +732,11 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 2), textClass[0]);
                 }
                 else if ((i == 1) && (HTypeS.equals("僚艦夜戦突撃"))) {
-                    String tooltipText = getHpString(originHp[atack.origin[0] + 1], maxOriginHp[atack.origin[0] + 1]);
+                    String tooltipText = getHpString(originHp[atack.origin[0] + offset + 1],
+                            maxOriginHp[atack.origin[0] + offset + 1]);
                     this.inline("td", text[0], null);
-                    this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, atack.origin[0] + 1), textClass[0]);
+                    this.inline("td", "title='" + tooltipText + "'",
+                            this.getShipName(origin, atack.origin[0] + offset + 1), textClass[0]);
                 }
                 else {
                     this.inline("td", getColSpan(2), "", null);

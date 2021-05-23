@@ -498,6 +498,10 @@ public class BattleAtackDto {
             return "瑞雲立体攻撃";
         case 201:
             return "海空立体攻撃";
+        case 300:
+        case 301:
+        case 302:
+            return "潜水艦隊攻撃";
         }
         return "不明(" + this.type + ")";
     }
@@ -522,9 +526,18 @@ public class BattleAtackDto {
         case 6:
             return "夜襲カットイン(" + toShowItemTypeString(showitem, false) + ")";
         case 7:
+        case 11:
             return "駆逐カットイン(主砲/魚雷/電探)";
         case 8:
-            return "駆逐カットイン(魚雷/見張員/電探)";
+        case 12:
+            // API値変化(2021/05/08～)
+            return "駆逐カットイン(" + toShowItemTypeString(showitem, false) + ")";
+        case 9:
+        case 13:
+            return "駆逐カットイン(魚雷/魚雷/見張員)";
+        case 10:
+        case 14:
+            return "駆逐カットイン(魚雷/ドラム缶/見張員)";
         case 100:
             return "ネルソンタッチ";
         case 101:
@@ -539,6 +552,10 @@ public class BattleAtackDto {
             return "瑞雲立体攻撃";
         case 201:
             return "海空立体攻撃";
+        case 300:
+        case 301:
+        case 302:
+            return "潜水艦隊攻撃";
         }
         return "不明(" + this.type + ")";
     }
@@ -571,6 +588,14 @@ public class BattleAtackDto {
                 .map(item -> {
                     if (Objects.nonNull(item)) {
                         switch (item.getType3()) {
+                        case 5:
+                            return "魚雷";
+                        case 11:
+                            return "電探";
+                        case 25:
+                            return "ドラム缶";
+                        case 32:
+                            return "見張員";
                         case 45:
                             return "夜戦";
                         case 46:

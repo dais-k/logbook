@@ -16,8 +16,8 @@ import logbook.dto.ShipBaseDto;
  *
  */
 public class SakutekiString implements Comparable<SakutekiString> {
-    private static int[] US_SHIP = { 65, 69, 83, 84, 87, 91, 99, 102, 105, 106 };
-    // private static int[] UK_SHIP = { 67, 78, 82, 88 };
+    private static int[] US_SHIP = { 65, 69, 83, 84, 87, 91, 99, 102, 105, 106, 107, 110 };
+    // private static int[] UK_SHIP = { 67, 78, 82, 88, 108 };
     private double f33TotalShipLoS = 0;
     private double f33TotalItemLoS = 0;
     private double hqLvLoS = 0;

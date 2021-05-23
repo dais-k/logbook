@@ -370,6 +370,11 @@ public class TsunDBClient extends Thread {
         List<Integer> fleetoneexslots = new ArrayList<Integer>();
         List<Integer> fleetonetypes = new ArrayList<Integer>();
         for (ShipDto ship : ships) {
+            // 0で送信する事象が何故かあるので、そのようなデータがあったら弾いておく
+            if (ship.getShipId() == 0) {
+                ApplicationMain.main.printMessage("ShipIDが見つからなかったため、TsunDBへの送信をスキップしました");
+                return;
+            }
             fleetlevel += ship.getLv();
             fleetSpeed = Math.min(fleetSpeed, ship.getParam().getSoku());
             fleetids.add(ship.getShipId());
@@ -402,6 +407,11 @@ public class TsunDBClient extends Thread {
             List<Integer> fleettwoexslots = new ArrayList<Integer>();
             List<Integer> fleettwotypes = new ArrayList<Integer>();
             for (ShipDto ship : ships2) {
+                // 0で送信する事象が何故かあるので、そのようなデータがあったら弾いておく
+                if (ship.getShipId() == 0) {
+                    ApplicationMain.main.printMessage("ShipIDが見つからなかったため、TsunDBへの送信をスキップしました");
+                    return;
+                }
                 fleetlevel += ship.getLv();
                 fleetSpeed = Math.min(fleetSpeed, ship.getParam().getSoku());
                 fleetids.add(ship.getShipId());

@@ -71,6 +71,16 @@ public class DaihatsuString {
                         ++this.numTokuDihatsu;
                         this.totalDaihatsuLevel += item.getLevel();
                     }
+                    else if (item.getName().equals("武装大発")) {
+                        this.daihatsuUpBase += 3.0;
+                        ++this.numDaihatsuType;
+                        this.totalDaihatsuLevel += item.getLevel();
+                    }
+                    else if (item.getName().equals("装甲艇(AB艇)")) {
+                        this.daihatsuUpBase += 2.0;
+                        ++this.numDaihatsuType;
+                        this.totalDaihatsuLevel += item.getLevel();
+                    }
                 }
             }
         }
