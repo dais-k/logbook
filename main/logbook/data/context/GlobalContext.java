@@ -1599,7 +1599,7 @@ public final class GlobalContext {
 
                     // 更新
                     battle.getDock().setUpdate(true);
-                    battle.getDockCombined().setUpdate(true);
+                    // battle.getDockCombined().setUpdate(true);
                 }
             }
             addConsole("単艦退避しました");
