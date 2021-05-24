@@ -347,7 +347,7 @@ public class TsunDBClient extends Thread {
                 .add("nodeInfo", nodeinfo)
                 .add("nextRoute", json.getInt("api_next"))
                 .add("sortiedFleet", sortiedFleet + 1)
-                .add("fleetType", GlobalContext.getCombined())
+                .add("fleetType", sortiedFleet == 0 ? GlobalContext.getCombined() : 0)
                 .add("fleet1", handleFleet(sortiedFleet + 1));
         DockDto dock = GlobalContext.getDock(String.valueOf(sortiedFleet + 1));
         List<ShipDto> s = dock.getShips();
@@ -538,7 +538,7 @@ public class TsunDBClient extends Thread {
                 fleet1.add(ships.get(i).getCharId());
             }
         }
-        if (GlobalContext.isCombined()) {
+        if (GlobalContext.isCombined() && sortiedFleet == 0) {
             DockDto dock2 = GlobalContext.getDock(String.valueOf(2));
             List<ShipDto> ships2 = dock2.getShips();
             boolean[] escaped2 = dock2.getEscaped();
