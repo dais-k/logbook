@@ -389,7 +389,7 @@ public class TsunDBClient extends Thread {
         job.add("fleetoneequips", toJsonArray(fleetoneequips.stream().mapToInt(i -> i).toArray()))
                 .add("fleetoneexslots", toJsonArray(fleetoneexslots.stream().mapToInt(i -> i).toArray()))
                 .add("fleetonetypes", toJsonArray(fleetonetypes.stream().mapToInt(i -> i).toArray()));
-        if (GlobalContext.isCombined()) {
+        if (GlobalContext.isCombined() && sortiedFleet == 0) {
             DockDto dock2 = GlobalContext.getDock(String.valueOf(2));
             List<ShipDto> s2 = dock2.getShips();
             boolean[] escaped2 = dock2.getEscaped();
