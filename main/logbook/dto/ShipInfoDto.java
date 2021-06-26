@@ -51,10 +51,6 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(6)
     private int aftershipid;
 
-    /** 改造前の艦 */
-    @Tag(31)
-    private int[] beforeshpids;
-
     /** flagshipもしくはelite (敵艦のみ) */
     @Tag(7)
     private String flagship;
@@ -92,9 +88,6 @@ public final class ShipInfoDto extends AbstractDto {
 
     @Tag(33)
     private int ctype;
-
-    // 探索用
-    private transient Object data = null;
 
     private transient boolean before20170405;
 
@@ -245,20 +238,6 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setAftershipid(int aftershipid) {
         this.aftershipid = aftershipid;
-    }
-
-    /**
-     * @return beforeshpids
-     */
-    public int[] getBeforeshpids() {
-        return this.beforeshpids;
-    }
-
-    /**
-     * @param beforeshpids セットする beforeshpids
-     */
-    public void setBeforeshpids(int[] beforeshpids) {
-        this.beforeshpids = beforeshpids;
     }
 
     /**
@@ -486,20 +465,6 @@ public final class ShipInfoDto extends AbstractDto {
         if (this.before20170405)
             return !this.isEnemy();
         return this.shipId < 1501;
-    }
-
-    /**
-     * @return data
-     */
-    public Object getData() {
-        return this.data;
-    }
-
-    /**
-     * @param data セットする data
-     */
-    public void setData(Object data) {
-        this.data = data;
     }
 
     /**

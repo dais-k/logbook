@@ -102,7 +102,7 @@ public class BattleAtackDto {
                 dto.target = new int[length];
                 dto.damage = new int[length];
                 dto.critical = new int[length];
-                dto.showitem = flatten_si_list.get(i);
+                dto.showitem = flatten_si_list.get(i - baseidx);
                 for (int c = 0; c < length; ++c) {
                     dto.target[c] = flatten_df_list.get(c);
                     dto.damage[c] = flatten_damage_list.get(c);

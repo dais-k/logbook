@@ -607,34 +607,4 @@ public abstract class ShipBaseDto extends AbstractDto {
     public ItemDto getSlotExItem() {
         return this.slotExItem;
     }
-
-    /*
-     * 艦隊晒しの作成の過程で勘違いして作ってしまいました
-     * メソッド名は適当なので好きに変えてください
-     */
-
-    private int getFinalShipId(ShipInfoDto afterShipinfo) {
-        int afterShipId = afterShipinfo.getAftershipid();
-        if ((afterShipId == 0) || (Ship.get(afterShipId).getBeforeshpids().length > Ship.get(afterShipinfo.getShipId())
-                .getBeforeshpids().length)) {
-            return afterShipinfo.getShipId();
-        }
-        return this.getFinalShipId(Ship.get(afterShipId));
-
-    }
-
-    /**
-     * 最終改造状態のidを取得します(甲、乙などと付いている場合はそちらを優先)
-     *
-     * @return 最終改造状態のid
-     */
-    public int getFinalShipId() {
-        int afterShipId = this.shipInfo.getAftershipid();
-
-        if (afterShipId == 0) {
-            return this.shipInfo.getShipId();
-        }
-        return this.getFinalShipId(Ship.get(afterShipId));
-
-    }
 }

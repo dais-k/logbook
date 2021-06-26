@@ -5,11 +5,14 @@ package logbook.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -23,8 +26,6 @@ import logbook.dto.ShipInfoDto;
 import logbook.dto.UseItemDto;
 import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Nekopanda
@@ -366,59 +367,35 @@ public class MasterData {
             this.time = new Date();
         }
 
-        private void visitShip(ShipInfoDto ship, int[] charId) {
-            if ((ship != null) && (ship.getData() == null)) {
-                ship.setData(charId);
-
-                if (ship.getAftershipid() != 0) {
-                    this.visitShip(this.ships.get(ship.getAftershipid()), charId);
-                }
-                if (ship.getBeforeshpids() != null) {
-                    for (int shipid : ship.getBeforeshpids()) {
-                        this.visitShip(this.ships.get(shipid), charId);
-                    }
-                }
-            }
-        }
-
         /**
          * 初期艦IDを計算します
          */
         private void setCharId() {
-            // リセット
-            for (ShipInfoDto dto : this.ships.values()) {
-                dto.setData(null);
-                dto.setBeforeshpids(null);
-            }
-            // beforeshipidsを生成
-            for (ShipInfoDto dto : this.ships.values()) {
-                if (dto.getAftershipid() != 0) {
-                    ShipInfoDto afterShip = this.ships.get(dto.getAftershipid());
-                    if (afterShip != null) {
-                        afterShip.setBeforeshpids(ArrayUtils.add(afterShip.getBeforeshpids(), dto.getShipId()));
-                    }
-                }
-            }
-            // 同じ島に同じint[]を配置
-            for (ShipInfoDto dto : this.ships.values()) {
-                this.visitShip(dto, new int[] { -1 });
-            }
             // 初期艦のIDを探す
-            for (ShipInfoDto dto : this.ships.values()) {
-                if (dto.getBeforeshpids() == null) {
-                    int[] charId = (int[]) dto.getData();
-                    // 複数見つかったら（普通はありえないが）小さい方にしておく
-                    if ((charId[0] == -1) || (charId[0] > dto.getShipId())) {
-                        charId[0] = dto.getShipId();
-                    }
-                }
-            }
-            // IDをセット
-            for (ShipInfoDto dto : this.ships.values()) {
-                int[] charId = (int[]) dto.getData();
-                dto.setCharId(charId[0]);
-                dto.setData(null);
-            }
+            this.ships.values().stream()
+                    .collect(Collectors.groupingBy(ShipInfoDto::getFlagship))
+                    .values()
+                    .stream()
+                    .forEach(list -> {
+                        if (list.stream().anyMatch(ShipInfoDto::isEnemy)) {
+                            // 敵艦は全部-1にしておく
+                            list.stream().forEach(dto -> dto.setCharId(-1));
+                            return;
+                        }
+                        List<Integer> shipids = list.stream().map(ShipInfoDto::getShipId)
+                                .collect(Collectors.toList());
+                        List<Integer> aftershipids = list.stream().map(ShipInfoDto::getAftershipid)
+                                .collect(Collectors.toList());
+                        OptionalInt optCharId = shipids.stream().filter(shipid -> !aftershipids.contains(shipid))
+                                .mapToInt(Integer::intValue)
+                                .findFirst();
+
+                        int shipId = optCharId.orElse(
+                                // 実質宗谷用
+                                list.stream().sorted(Comparator.comparing(ShipInfoDto::getAfterlv)
+                                        .thenComparing(ShipInfoDto::getSortNo)).findFirst().get().getShipId());
+                        list.stream().forEach(dto -> dto.setCharId(shipId));
+                    });
         }
 
         /**
