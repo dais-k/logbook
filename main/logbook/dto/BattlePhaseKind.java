@@ -7,7 +7,8 @@ import logbook.data.DataType;
 
 /**
  * @author Nekopanda
- *
+ * 適当な箇所にenumを追加してしまっているせいで、過去のbattlelogを正常に読み込めない可能性あり
+ * 新規APIが来たら下に追加すること
  */
 public enum BattlePhaseKind {
 
@@ -40,9 +41,9 @@ public enum BattlePhaseKind {
     /** レーダー射撃戦 */
     LD_SHOOTING(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.LD_SHOOTING),
     /** 連合艦隊長距離空襲戦 */
-    COMBINED_LD_AIR(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_AIRBATTLE),
+    COMBINED_LD_AIR(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.COMBINED_LD_AIRBATTLE),
     /** 連合艦隊レーダー射撃戦 */
-    COMBINED_LD_SHOOTING(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_SHOOTING),
+    COMBINED_LD_SHOOTING(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.COMBINED_LD_SHOOTING),
     /** 通常艦隊敵連合艦隊の昼戦*/
     COMBINED_EC_BATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.COMBINED_EC_BATTLE),
     /** 通常艦隊敵連合艦隊の夜戦 */

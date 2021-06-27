@@ -60,7 +60,7 @@ public class BattleAtackDto {
     public boolean combineEnabled;
 
     private static List<BattleAtackDto> makeHougeki(int baseidx,
-            JsonArray at_efalg, JsonArray at_list,
+            JsonArray at_eflag, JsonArray at_list,
             JsonArray at_type, JsonArray df_list, JsonArray cl_list, JsonArray damage_list, JsonArray si_list) {
         ArrayList<BattleAtackDto> result = new ArrayList<BattleAtackDto>();
         ArrayList<Integer> flatten_df_list = new ArrayList<Integer>();
@@ -68,7 +68,7 @@ public class BattleAtackDto {
         ArrayList<Integer> flatten_cl_list = new ArrayList<Integer>();
         ArrayList<int[]> flatten_si_list = new ArrayList<int[]>();
         // 7隻実装以降は常にある
-        boolean hasEflag = (at_efalg != null);
+        boolean hasEflag = (at_eflag != null);
 
         for (int i = baseidx; i < at_list.size(); ++i) {
             int at = at_list.getInt(i);
@@ -93,7 +93,7 @@ public class BattleAtackDto {
                 BattleAtackDto dto = new BattleAtackDto();
                 dto.kind = AtackKind.HOUGEKI;
                 // hasEflagがない場合は最大6隻
-                dto.friendAtack = hasEflag ? (at_efalg.getInt(i) == 0) : (at <= 6);
+                dto.friendAtack = hasEflag ? (at_eflag.getInt(i) == 0) : (at <= 6);
                 if (at_type != null) {
                     dto.type = at_type.getInt(i);
                 }
@@ -104,7 +104,8 @@ public class BattleAtackDto {
                 dto.critical = new int[length];
                 dto.showitem = flatten_si_list.get(i - baseidx);
                 for (int c = 0; c < length; ++c) {
-                    dto.target[c] = flatten_df_list.get(c);
+                    // 旧フォーマット用
+                    dto.target[c] = hasEflag ? flatten_df_list.get(c) : flatten_df_list.get(c) % 6;
                     dto.damage[c] = flatten_damage_list.get(c);
                     dto.critical[c] = flatten_cl_list.get(c);
                 }
