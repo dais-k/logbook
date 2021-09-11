@@ -417,7 +417,7 @@ public class TsunDBClient extends Thread {
                 fleetids.add(ship.getShipId());
                 for (int j = 0; j < ship.getSlotNum(); j++) {
                     ItemDto item = ship.getItem2().get(j);
-                    fleetoneequips.add(Objects.nonNull(item) ? item.getSlotitemId() : -1);
+                    fleettwoequips.add(Objects.nonNull(item) ? item.getSlotitemId() : -1);
                 }
                 fleettwoexslots
                         .add(Objects.nonNull(ship.getSlotExItem()) ? ship.getSlotExItem().getSlotitemId() : -1);
