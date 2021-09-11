@@ -81,6 +81,11 @@ public class DaihatsuString {
                         ++this.numDaihatsuType;
                         this.totalDaihatsuLevel += item.getLevel();
                     }
+                    else if (item.getName().equals("大発動艇(II号戦車/北アフリカ仕様)")) {
+                        this.daihatsuUpBase += 2.0;
+                        ++this.numDaihatsuType;
+                        this.totalDaihatsuLevel += item.getLevel();
+                    }
                 }
             }
         }
