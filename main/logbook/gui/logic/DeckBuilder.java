@@ -375,7 +375,7 @@ public class DeckBuilder {
                         JsonArrayBuilder itemJson = Json.createArrayBuilder();
                         for (int itemId = 0; itemId < ship.getSlotNum(); itemId++) {
                             ItemDto item = items.get(itemId);
-                            if (Objects.nonNull(item)) {
+                            if (Objects.nonNull(item) && item.getSlotitemId() > 0) {
                                 itemJson.add(Json.createObjectBuilder()
                                         .add("masterId", item.getSlotitemId())
                                         .add("improvement", item.getLevel())
@@ -386,7 +386,7 @@ public class DeckBuilder {
                             }
                         }
                         ItemDto item = ship.getSlotExItem();
-                        if (Objects.nonNull(item)) {
+                        if (Objects.nonNull(item) && item.getSlotitemId() > 0) {
                             itemJson.add(Json.createObjectBuilder()
                                     .add("masterId", item.getSlotitemId())
                                     .add("improvement", item.getLevel())
@@ -441,9 +441,9 @@ public class DeckBuilder {
             Map<Integer, AirCorpsDto> aircorps = airbase.get().get(area);
             for (int aircorpId = 1; aircorpId <= 3; aircorpId++) {
                 AirCorpsDto aircorp = aircorps.get(aircorpId);
+                JsonObjectBuilder aircorpsJson = Json.createObjectBuilder();
                 if (Objects.nonNull(aircorp)) {
-                    Map<Integer, SquadronDto> squadrons = aircorps.get(aircorpId).getSquadrons();
-                    JsonObjectBuilder aircorpsJson = Json.createObjectBuilder();
+                    Map<Integer, SquadronDto> squadrons = aircorp.getSquadrons();
                     int[] slots = { 18, 18, 18, 18 };
                     JsonArrayBuilder squadronJson = Json.createArrayBuilder();
                     for (int squadronId = 1; squadronId <= 4; squadronId++) {
@@ -451,7 +451,7 @@ public class DeckBuilder {
                             SquadronDto squadron = squadrons.get(squadronId);
                             slots[squadronId - 1] = squadron.getMaxCount();
                             ItemDto item = GlobalContext.getItem(squadron.getSlotid());
-                            if (Objects.nonNull(item)) {
+                            if (Objects.nonNull(item) && item.getSlotitemId() > 0) {
                                 squadronJson.add(Json.createObjectBuilder()
                                         .add("masterId", item.getSlotitemId())
                                         .add("improvement", item.getLevel())
@@ -467,8 +467,15 @@ public class DeckBuilder {
                     }
                     aircorpsJson.add("slots", JsonUtils.toJsonArray(slots))
                             .add("equipments", squadronJson);
-                    landBaseJson.add(aircorpsJson);
+                } else {
+                    JsonArrayBuilder squadronJson = Json.createArrayBuilder();
+                    for (int squadronId = 1; squadronId <= 4; squadronId++) {
+                        squadronJson.addNull();
+                    }
+                    aircorpsJson.add("slots", JsonUtils.toJsonArray(new int[] { 0, 0, 0, 0 }))
+                            .add("equipments", squadronJson);
                 }
+                landBaseJson.add(aircorpsJson);
             }
             json.add("landBase", landBaseJson);
         }

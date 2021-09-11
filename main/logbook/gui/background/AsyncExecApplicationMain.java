@@ -734,7 +734,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 Map<Integer, MissionDto> missions = MasterData.get().getStart2().getMission();
                 Map<Integer, Integer> missionStates = MasterData.get().getMissionState();
                 List<Integer> MONTHLY_EXPEDITION = Arrays.asList(
-                        103, 104, 105, 111, 112, 113, 114, 42, 43, 44, 132, 141);
+                        103, 104, 105, 111, 112, 113, 114, 115, 42, 43, 44, 46, 132, 133, 141, 142);
                 List<MissionDto> nocompletions = missions.values().stream()
                         .filter(mission -> MONTHLY_EXPEDITION.contains(mission.getId()))
                         .filter(mission -> missionStates.containsKey(mission.getId()))
