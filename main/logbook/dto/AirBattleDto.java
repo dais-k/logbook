@@ -192,6 +192,8 @@ public class AirBattleDto {
                 return "36:Fletcher砲改x2/GFCS";
             case 37:
                 return "37:Fletcher砲改x2";
+            case 38:
+                return "38:Atlanta砲+GFCSx2";
             case 39:
                 return "39:Atlanta砲+GFCS/Atlanta砲";
             case 40:
