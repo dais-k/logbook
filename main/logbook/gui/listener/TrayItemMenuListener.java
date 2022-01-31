@@ -1,5 +1,6 @@
 package logbook.gui.listener;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import logbook.config.AppConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
+import logbook.dto.ItemDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
@@ -47,7 +49,12 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         final Shell shell = ApplicationMain.main.getShell();
         this.menu = new Menu(shell);
         // 装備数
-        int itemCount = GlobalContext.getItemMap().size();
+        Integer[] exclusions = { 23, 43, 44 };
+        int itemCount = (int) GlobalContext.getItemMap().values()
+            .stream()
+            .map(ItemDto::getType2)
+            .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
+            .count();
         // 最大保有可能 装備数
         int itemMax = GlobalContext.maxSlotitem();
         // 艦娘数

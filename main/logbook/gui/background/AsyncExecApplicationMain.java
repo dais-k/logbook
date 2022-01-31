@@ -143,7 +143,13 @@ public final class AsyncExecApplicationMain extends Thread {
             }
             try {
                 Button itemList = this.main.getItemList();
-                String setText = "所有装備(" + GlobalContext.getItemMap().size() + "/"
+                Integer[] exclusions = { 23, 43, 44 };
+                int itemCount = (int) GlobalContext.getItemMap().values()
+                    .stream()
+                    .map(ItemDto::getType2)
+                    .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
+                    .count();
+                String setText = "所有装備(" + itemCount + "/"
                         + GlobalContext.maxSlotitem() + ")";
                 if (!setText.equals(itemList.getText())) {
                     itemList.setText(setText);
