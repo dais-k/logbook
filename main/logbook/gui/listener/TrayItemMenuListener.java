@@ -49,12 +49,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         final Shell shell = ApplicationMain.main.getShell();
         this.menu = new Menu(shell);
         // 装備数
-        Integer[] exclusions = { 23, 43, 44 };
-        int itemCount = (int) GlobalContext.getItemMap().values()
-            .stream()
-            .map(ItemDto::getType2)
-            .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
-            .count();
+        int itemCount = GlobalContext.slotItemSize();
         // 最大保有可能 装備数
         int itemMax = GlobalContext.maxSlotitem();
         // 艦娘数

@@ -143,12 +143,7 @@ public final class AsyncExecApplicationMain extends Thread {
             }
             try {
                 Button itemList = this.main.getItemList();
-                Integer[] exclusions = { 23, 43, 44 };
-                int itemCount = (int) GlobalContext.getItemMap().values()
-                    .stream()
-                    .map(ItemDto::getType2)
-                    .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
-                    .count();
+                int itemCount = GlobalContext.slotItemSize();
                 String setText = "所有装備(" + itemCount + "/"
                         + GlobalContext.maxSlotitem() + ")";
                 if (!setText.equals(itemList.getText())) {
@@ -836,7 +831,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 // タブを更新する
                 CTabItem maintab = this.main.getTabFolder().getItem(0);
                 maintab.setToolTipText(
-                        "装備:" + GlobalContext.getItemMap().size() + "/"
+                        "装備:" + GlobalContext.slotItemSize() + "/"
                                 + GlobalContext.maxSlotitem()
                                 + " 艦娘:" + GlobalContext.getShipMap().size() + "/"
                                 + GlobalContext.maxChara());

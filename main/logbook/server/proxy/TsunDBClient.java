@@ -141,7 +141,7 @@ public class TsunDBClient extends Thread {
         case BATTLE_RESULT:
         case COMBINED_BATTLE_RESULT:
             int shipCount = GlobalContext.getShipMap().size();
-            int itemCount = GlobalContext.getItemMap().size();
+            int itemCount = GlobalContext.slotItemSize();
             if (GlobalContext.maxChara() > shipCount &&
                     GlobalContext.maxSlotitem() > itemCount) {
                 processDrop(data);

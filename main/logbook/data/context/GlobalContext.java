@@ -261,6 +261,19 @@ public final class GlobalContext {
     }
 
     /**
+     * 装備数
+     * @return 装備数
+     */
+    public static int slotItemSize() {
+        Integer[] exclusions = { 23, 43, 44 };
+        return (int) getItemMap().values()
+            .stream()
+            .map(ItemDto::getType2)
+            .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
+            .count();
+    }
+
+    /**
      * アイテムIDからアイテム
      * @param itemId
      * @return
