@@ -261,7 +261,7 @@ public final class GlobalContext {
     }
 
     /**
-     * 装備数
+     * 装備数(ダメコン等除外)
      * @return 装備数
      */
     public static int slotItemSize() {
@@ -1390,7 +1390,7 @@ public final class GlobalContext {
                 JsonObject apidata = (JsonObject) json;
                 if (battle == null) {
                     battle = new BattleExDto(data.getCreateDate());
-                    battle.setBasicInfo(maxChara - shipMap.size(), maxSlotitem - itemMap.size());
+                    battle.setBasicInfo(maxChara - shipMap.size(), maxSlotitem - slotItemSize());
                     battle.setCombinedKind(combinedKind);
                 }
                 BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind, false);
@@ -2737,7 +2737,7 @@ public final class GlobalContext {
                     MasterData.updateMapInfo(apidata);
 
                     int shipSpace = maxChara - shipMap.size();
-                    int itemSpace = maxSlotitem - itemMap.size();
+                    int itemSpace = maxSlotitem - slotItemSize();
                     // 装備の空き枠が少ない時はバルーンを出す
                     if (AppConfig.get().isEnableItemFullBalloonNotify() &&
                             (itemSpace <= AppConfig.get().getItemFullBalloonNotify())) {
