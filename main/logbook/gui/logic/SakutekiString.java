@@ -16,8 +16,6 @@ import logbook.dto.ShipBaseDto;
  *
  */
 public class SakutekiString implements Comparable<SakutekiString> {
-    private static int[] US_SHIP = { 65, 69, 83, 84, 87, 91, 99, 102, 105, 106, 107, 110 };
-    // private static int[] UK_SHIP = { 67, 78, 82, 88, 108 };
     private double f33TotalShipLoS = 0;
     private double f33TotalItemLoS = 0;
     private double hqLvLoS = 0;
@@ -38,20 +36,8 @@ public class SakutekiString implements Comparable<SakutekiString> {
             int itemParamLoS = this.items.stream().filter(Objects::nonNull)
                     .mapToInt(item -> item.getParam().getSakuteki())
                     .sum();
-            Map<Integer, List<ItemDto>> itemCounts = this.items.stream().filter(Objects::nonNull)
-                    .collect(Collectors.groupingBy(ItemDto::getSlotitemId));
-            int itemBonus = 0;
-            if (Arrays.stream(US_SHIP).anyMatch(ctype -> ctype == ship.getShipInfo().getCtype())) {
-                // itemBonus += itemCounts.containsKey(278) ? 1 : 0;
-                // itemBonus += itemCounts.containsKey(279) ? 2 : 0;
-                itemBonus += itemCounts.containsKey(315) ? itemCounts.get(315).size() * 4 : 0;
-            }
-            // if (Arrays.stream(UK_SHIP).anyMatch(ctype -> ctype == ship.getShipInfo().getCtype())) {
-            //     itemBonus += itemCounts.containsKey(279) ? 1 : 0;
-            // }
 
-            this.shipLoS = Math.sqrt(this.ship.getSakuteki() - itemParamLoS - itemBonus);
-
+            this.shipLoS = Math.sqrt(this.ship.getSakuteki() - itemParamLoS);
             this.itemLoS = items.stream().filter(Objects::nonNull).mapToDouble(item -> {
                 int los = item.getParam().getSaku();
                 int lv = item.getLevel();

@@ -3,7 +3,6 @@ package logbook.gui.widgets;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
@@ -351,9 +350,9 @@ public class FleetComposite extends Composite {
         // 艦隊合計索敵値(装備込)
         double totalLOS = 0;
         // 艦隊合計対潜値(装備込)
-        double totaltaisen = 0;
+        double totalASW = 0;
         // 艦隊合計対空値(装備込)
-        double totaltaiku = 0;
+        double totalAA = 0;
 
         int dockIndex = Integer.parseInt(dock.getId()) - 1;
         CondTiming condTiming = GlobalContext.getCondTiming();
@@ -405,23 +404,22 @@ public class FleetComposite extends Composite {
             totalFirepower += ship.getKaryoku() + getExpeditionPlaneBonus(onslot, itemList, "houg") + itemList.stream()
                     .mapToDouble(item -> {
                         switch (item.getType2()) {
-                        /** 小口径主砲 */
-                        case 1:
+                        case 1: // 小口径主砲
                             return 0.5 * Math.sqrt(item.getLevel());
-                        /** 中口径主砲 */
-                        case 2:
+                        case 2: // 中口径主砲
                             return Math.sqrt(item.getLevel());
-                        /** 大口径主砲 */
-                        case 3:
-                            return 0.95 * Math.sqrt(item.getLevel());
-                        /** 副砲 */
-                        case 4:
-                            return 0.15 * item.getLevel();
-                        /** 徹甲弾 */
-                        case 19:
+                        case 3: // 大口径主砲
+                            return Math.sqrt(item.getLevel());
+                        case 4: // 副砲
                             return 0.5 * Math.sqrt(item.getLevel());
-                        /** 機銃 */
-                        case 21:
+                        case 12: // 小型電探
+                            return 0.5 * Math.sqrt(item.getLevel());
+                        case 13:
+                        case 93: // 大型電探
+                            return Math.sqrt(item.getLevel());
+                        case 19: // 対艦強化弾
+                            return 0.5 * Math.sqrt(item.getLevel());
+                        case 21: // 機銃
                             return 0.5 * Math.sqrt(item.getLevel());
                         }
                         return 0;
@@ -429,36 +427,50 @@ public class FleetComposite extends Composite {
             // 艦隊合計索敵値(装備込)
             totalLOS += ship.getSakuteki() + getExpeditionPlaneBonus(onslot, itemList, "saku") + itemList.stream()
                     .mapToDouble(item -> {
-                        switch (item.getType3()) {
-                        /** 電探 */
-                        case 11:
+                        switch (item.getType2()) {
+                        case 10: // 水上偵察機
+                            return Math.sqrt(item.getLevel());
+                        case 12:
+                        case 13:
+                        case 93: // 電探
                             return Math.sqrt(item.getLevel());
                         }
                         return 0;
                     }).sum();
             // 艦隊合計対潜値(装備込)
-            totaltaisen += ship.getTaisen() + getExpeditionPlaneBonus(onslot, itemList, "tais")
+            totalASW += ship.getTaisen() + getExpeditionPlaneBonus(onslot, itemList, "tais")
                     + itemList.stream()
                             .mapToDouble(item -> {
                                 switch (item.getType2()) {
-                                /** ソナー */
-                                case 14:
-                                    /** 爆雷 */
-                                case 15:
+                                case 10: // 水上偵察機
+                                case 11: // 水上爆撃機
+                                case 7: // 艦上爆撃機
+                                case 8: // 艦上攻撃機
+                                case 25: // オートジャイロ
+                                    if (item.getParam().getTaisen() < 5) {
+                                        return 0;
+                                    }
+                                    else if (item.getParam().getTaisen() < 7) { // 6かも
+                                        return 0.5 * Math.sqrt(item.getLevel());
+                                    }
+                                    else {
+                                        return Math.sqrt(item.getLevel());
+                                    }
+                                case 14: // ソナー
+                                    return Math.sqrt(item.getLevel());
+                                case 15: // 爆雷
                                     return Math.sqrt(item.getLevel());
                                 }
                                 return 0;
                             }).sum();
             // 艦隊合計対空値(装備込)
-            totaltaiku += ship.getTaiku() + getExpeditionPlaneBonus(onslot, itemList, "tyku") + itemList.stream()
+            totalAA += ship.getTaiku() + getExpeditionPlaneBonus(onslot, itemList, "tyku") + itemList.stream()
                     .mapToDouble(item -> {
                         switch (item.getType3()) {
-                        /** 機銃 */
-                        case 15:
+                        case 15: // 機銃
                             return Math.sqrt(item.getLevel());
-                        /** 高角砲 */
-                        case 16:
-                            return 0.3 * item.getLevel();
+                        case 16: // 高角砲
+                            return Math.sqrt(item.getLevel());
                         }
                         return 0;
                     }).sum();
@@ -902,7 +914,7 @@ public class FleetComposite extends Composite {
         }
         // 遠征
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_EXPEDITION, totalFirepower,
-                totaltaiku, totaltaisen, totalLOS), null);
+                totalAA, totalASW, totalLOS), null);
         this.addStyledText(this.message, "\n", null);
         // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);

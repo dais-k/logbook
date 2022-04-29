@@ -55,34 +55,43 @@ public class DaihatsuString {
                         ++this.numDaihatsuType;
                         this.totalDaihatsuLevel += item.getLevel();
                     }
-                    else if (item.getName().equals("大発動艇(八九式中戦車&陸戦隊)")) {
-                        this.daihatsuUpBase += 2.0;
-                        ++this.numDaihatsuType;
-                        this.totalDaihatsuLevel += item.getLevel();
-                    }
-                    else if (item.getName().equals("特二式内火艇")) {
-                        this.daihatsuUpBase += 1.0;
-                        ++this.numDaihatsuType;
-                        this.totalDaihatsuLevel += item.getLevel();
-                    }
                     else if (item.getName().equals("特大発動艇")) {
                         this.daihatsuUpBase += 5.0;
                         ++this.numDaihatsuType;
                         ++this.numTokuDihatsu;
                         this.totalDaihatsuLevel += item.getLevel();
                     }
-                    else if (item.getName().equals("武装大発")) {
-                        this.daihatsuUpBase += 3.0;
+                    else if (item.getName().equals("大発動艇(八九式中戦車&陸戦隊)")) {
+                        this.daihatsuUpBase += 2.0;
                         ++this.numDaihatsuType;
                         this.totalDaihatsuLevel += item.getLevel();
+                    }
+                    else if (item.getName().equals("特大発動艇+戦車第11連隊")) {
+                        this.daihatsuUpBase += 0;
+                        ++this.numDaihatsuType;
+                    }
+                    else if (item.getName().equals("M4A1 DD")) {
+                        this.daihatsuUpBase += 0;
+                        ++this.numDaihatsuType;
                     }
                     else if (item.getName().equals("装甲艇(AB艇)")) {
                         this.daihatsuUpBase += 2.0;
                         ++this.numDaihatsuType;
-                        this.totalDaihatsuLevel += item.getLevel();
+                    }
+                    else if (item.getName().equals("武装大発")) {
+                        this.daihatsuUpBase += 3.0;
+                        ++this.numDaihatsuType;
                     }
                     else if (item.getName().equals("大発動艇(II号戦車/北アフリカ仕様)")) {
                         this.daihatsuUpBase += 2.0;
+                        ++this.numDaihatsuType;
+                    }
+                    else if (item.getName().equals("特大発動艇+一式砲戦車")) {
+                        this.daihatsuUpBase += 2.0;
+                        ++this.numDaihatsuType;
+                    }
+                    else if (item.getName().equals("特二式内火艇")) {
+                        this.daihatsuUpBase += 1.0;
                         ++this.numDaihatsuType;
                         this.totalDaihatsuLevel += item.getLevel();
                     }

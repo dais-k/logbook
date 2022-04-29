@@ -117,8 +117,10 @@ public class TPString implements Comparable<TPString> {
         case 166: // 大発動艇(八九式中戦車＆陸戦隊)
         case 230: // 特大発動艇+戦車第11連隊
         case 355: // M4A1 DD
-        case 409: // 武装大発
         case 408: // 装甲艇(AB艇)
+        case 409: // 武装大発
+        case 436: // 大発動艇(II号戦車/北アフリカ仕様)
+        case 449: // 特大発動艇+一式砲戦車
             return 8;
         case 167: // 特二式内火艇
             return 2;
