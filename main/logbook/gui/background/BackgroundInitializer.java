@@ -144,6 +144,14 @@ public final class BackgroundInitializer extends Thread {
         }
 
         try {
+            // マップセル読み込み
+            MapEdges.load();
+            ApplicationMain.logPrint("マップセル読み込み完了");
+        } catch (IOException e) {
+            LOG.get().warn("マップセルの読み込みに失敗しました", e);
+        }
+
+        try {
             // 出撃ログファイル読み込み
             BattleResultServer.load();
             final int failCount = BattleResultServer.get().getFailCount();
@@ -161,16 +169,6 @@ public final class BackgroundInitializer extends Thread {
         } catch (Exception e) {
             LOG.get().warn("出撃ログの読み込みに失敗しました (" + AppConfig.get().getBattleLogPath() + ")", e);
         }
-
-        // マップセル読み込み
-        this.display.asyncExec(() -> {
-            try {
-                MapEdges.load();
-                ApplicationMain.logPrint("マップセル読み込み完了");
-            } catch (IOException e) {
-                LOG.get().warn("マップセルの読み込みに失敗しました", e);
-            }
-        });
 
         ApplicationMain.logPrint("バックグラウンド初期化完了");
     }
