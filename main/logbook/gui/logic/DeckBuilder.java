@@ -15,6 +15,7 @@ import logbook.dto.AirbaseDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.SquadronDto;
+import logbook.internal.LoggerHolder;
 
 /**
  * デッキビルダーのフォーマットを作成するクラス
@@ -22,6 +23,9 @@ import logbook.dto.SquadronDto;
  * @author Nishisonic
  */
 public class DeckBuilder {
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(DeckBuilder.class);
+
     private static final int DECKBUILDER_FORMAT_VERSION = 4;
     private static final double DECKBUILDER_V2_FORMAT_VERSION = 4.2;
     private static final String DECKBUILDER_URL = "http://kancolle-calc.net/deckbuilder.html";
@@ -228,23 +232,26 @@ public class DeckBuilder {
                 deck.add("f" + dockId, fleet);
             }
 
-            airbases.forEach(airbase -> {
-                List<SquadronDto> squadrons = airbase.getPlaneInfos();
-                JsonObjectBuilder squadronJson = Json.createObjectBuilder();
-                squadrons.forEach((squadron) -> {
-                    if (squadron.getSlotitemId() > 0) {
-                        squadronJson.add("i" + squadron.getSquadronId(), Json.createObjectBuilder()
-                                .add("id", squadron.getSlotitemId())
-                                .add("rf", squadron.getLevel())
-                                .add("mas", squadron.getAlv()));
-                    }
+            if (Objects.nonNull(airbases)) {
+                airbases.forEach(airbase -> {
+                    List<SquadronDto> squadrons = airbase.getPlaneInfos();
+                    JsonObjectBuilder squadronJson = Json.createObjectBuilder();
+                    squadrons.forEach((squadron) -> {
+                        if (squadron.getSlotitemId() > 0) {
+                            squadronJson.add("i" + squadron.getSquadronId(), Json.createObjectBuilder()
+                                    .add("id", squadron.getSlotitemId())
+                                    .add("rf", squadron.getLevel())
+                                    .add("mas", squadron.getAlv()));
+                        }
+                    });
+                    deck.add("a" + airbase.getRid(), Json.createObjectBuilder()
+                            .add("mode", airbase.getActionKind())
+                            .add("items", squadronJson));
                 });
-                deck.add("a" + airbase.getRid(), Json.createObjectBuilder()
-                        .add("mode", airbase.getActionKind())
-                        .add("items", squadronJson));
-            });
+            }
             return deck.build().toString();
         } catch (NullPointerException e) {
+            LOG.get().warn("デッキビルダー出力に失敗しました", e);
             return null;
         }
     }
