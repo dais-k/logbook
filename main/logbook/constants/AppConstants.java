@@ -34,7 +34,7 @@ public class AppConstants {
             .create("https://api.github.com/repos/Nishisonic/logbook/releases/latest");
 
     /** マップセル */
-    public static final URI MAP_EDGES_URI = URI.create("https://raw.githubusercontent.com/KC3Kai/KC3Kai/master/src/data/edges.json");
+    public static final URI MAP_EDGES_URI = URI.create("https://cdn.jsdelivr.net/gh/KC3Kai/KC3Kai@master/src/data/edges.json");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
