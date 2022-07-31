@@ -682,7 +682,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      */
     private void genHougekiTableContent(List<BattleAtackDto> atacks,
             ShipBaseDto[] friendShips, ShipBaseDto[] enemyShips, int[] friendHp, int[] enemyHp, int[] maxFriendHp,
-            int[] maxEnemyHp, boolean isDay) {
+            int[] maxEnemyHp, boolean isDay, boolean isCombined, boolean isEnemyCombined) {
         this.begin("tr", null);
         this.inline("th", "", null);
         this.inline("th", "艦", null);
@@ -705,6 +705,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             String[][] textClass;
             String[][] damageClass;
             int type = atack.type;
+            boolean isOriginCombined;
             if (atack.friendAtack) {
                 origin = friendShips;
                 originHp = friendHp;
@@ -715,6 +716,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 text = new String[] { "自軍", "敵軍" };
                 textClass = TEXT_CLASS[0];
                 damageClass = DAMAGE_CLASS[0];
+                isOriginCombined = isCombined;
             }
             else {
                 origin = enemyShips;
@@ -726,16 +728,18 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 text = new String[] { "敵軍", "自軍" };
                 textClass = TEXT_CLASS[1];
                 damageClass = DAMAGE_CLASS[1];
+                isOriginCombined = isEnemyCombined;
             }
 
-            String HTypeS = "";
             int offset = 0;
             for (int i = 0; i < atack.damage.length; ++i) {
                 this.begin("tr", null);
 
-                if (type == 300 || type == 301 || type == 302) {
+                String HTypeS = isDay ? atack.getHougekiTypeString(atack.showitem)
+                        : atack.getSpecialAttackString(atack.showitem);
+                if (HTypeS.equals("潜水艦隊攻撃")) {
                     int count = atack.damage.length;
-                    // 僚艦夜戦突撃
+                    // 潜水艦隊攻撃
                     int idx = (type == 300 || type == 302) && (i == 0 || count == 4 && i == 1) ? 1
                             : (type == 300 && i >= 2 || type == 301 && (i == 0 || count == 4 && i == 1)) ? 2
                                     : (type == 301 || type == 302) && (i >= 2) ? 3
@@ -751,10 +755,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     }
                 }
                 else if (i == 0) {
-                    HTypeS = isDay ? atack.getHougekiTypeString(atack.showitem)
-                            : atack.getSpecialAttackString(atack.showitem);
                     // 連合かつ僚艦夜戦突撃のときapi_at_list=0だった悲しみ
-                    offset = origin.length > 6 && HTypeS.equals("僚艦夜戦突撃") ? 6 : 0;
+                    offset = isOriginCombined && HTypeS.equals("僚艦夜戦突撃") ? 6 : 0;
 
                     String tooltipText = getHpString(originHp[atack.origin[0] + offset],
                             maxOriginHp[atack.origin[0] + offset]);
@@ -773,22 +775,24 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 4), textClass[0]);
                 }
-                else if ((i == 1) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！"))) {
+                else if ((i == 1) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！")
+                        || HTypeS.equals("大和、突撃します！二番艦も続いてください！"))) {
                     String tooltipText = getHpString(originHp[0], maxOriginHp[0]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 0), textClass[0]);
                 }
-                else if ((i == 2) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！"))) {
+                else if ((i == 2) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！")
+                        || HTypeS.equals("大和、突撃します！二番艦も続いてください！"))) {
                     String tooltipText = getHpString(originHp[1], maxOriginHp[1]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 1), textClass[0]);
                 }
-                else if ((i == 1) && (HTypeS.equals("コロラド特殊攻撃"))) {
+                else if ((i == 1) && (HTypeS.equals("コロラド特殊攻撃") || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！"))) {
                     String tooltipText = getHpString(originHp[1], maxOriginHp[1]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 1), textClass[0]);
                 }
-                else if ((i == 2) && (HTypeS.equals("コロラド特殊攻撃"))) {
+                else if ((i == 2) && (HTypeS.equals("コロラド特殊攻撃") || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！"))) {
                     String tooltipText = getHpString(originHp[2], maxOriginHp[2]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 2), textClass[0]);
@@ -1117,7 +1121,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.inline("h3", "砲雷撃", null);
             this.begin("table", DAMAGE_TABLE_CLASS[1]);
             this.genHougekiTableContent(friendlyHougeki, phase.getFriendlyFleet().toArray(new ShipBaseDto[0]),
-                    enemyShips, phase.getbeforeFriendlyFleetHp().clone(), enemyHp, maxFriendHp, maxEnemyHp, false);
+                    enemyShips, phase.getbeforeFriendlyFleetHp().clone(), enemyHp, maxFriendHp, maxEnemyHp, false,
+                    battle.isCombined(), battle.isEnemyCombined());
             this.end();
             this.inline("h3", "自軍攻撃", null);
         }
@@ -1169,7 +1174,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     this.inline("h3", "対潜先制爆雷攻撃", null);
                     this.begin("table", null);
                     this.genHougekiTableContent(phase.getOpeningTaisen(), friendShips, enemyShips, friendHp, enemyHp,
-                            maxFriendHp, maxEnemyHp, true);
+                            maxFriendHp, maxEnemyHp, true, battle.isCombined(), battle.isEnemyCombined());
                     this.end(); // table
                 }
                 if (phase.getOpening() != null) {
@@ -1220,7 +1225,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.inline("h3", "砲雷撃", null);
             this.begin("table", null);
             this.genHougekiTableContent(phase.getHougeki(), friendShips, enemyShips, friendHp, enemyHp,
-                    maxFriendHp, maxEnemyHp, false);
+                    maxFriendHp, maxEnemyHp, false, battle.isCombined(), battle.isEnemyCombined());
             this.end(); // table
         }
 
@@ -1239,7 +1244,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.inline("h3", "砲撃(" + (i + 1) + "/" + hougekiList.size() + ")", null);
             this.begin("table", null);
             this.genHougekiTableContent(hougekiList.get(i), friendShips, enemyShips, friendHp, enemyHp,
-                    maxFriendHp, maxEnemyHp, true);
+                    maxFriendHp, maxEnemyHp, true, battle.isCombined(), battle.isEnemyCombined());
             this.end(); // table
         }
 
