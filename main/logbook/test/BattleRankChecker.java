@@ -21,7 +21,6 @@ import javax.json.JsonReader;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattlePhaseKind;
 import logbook.dto.ResultRank;
-import logbook.internal.MasterData;
 
 import org.apache.commons.io.FileUtils;
 
@@ -65,7 +64,7 @@ public class BattleRankChecker {
      * @param args
      */
     public static void main(String[] args) {
-        boolean init = MasterData.INIT_COMPLETE;
+        // boolean init = MasterData.INIT_COMPLETE;
 
         List<FileName> fileNameList = new ArrayList<FileName>();
         listFiles(args[0], fileNameList);

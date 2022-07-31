@@ -30,6 +30,7 @@ import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TrayItemMenuListener;
 import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.AirbaseSeikuString;
 import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.DeckBuilder;
 import logbook.gui.logic.FleetAnalysis;
@@ -1200,19 +1201,19 @@ public final class ApplicationMain extends WindowBase {
         Menu copyDeckBuilderMenu = new Menu(rootCopyDeckBuilder);
 
         final MenuItem copyDeckBuilderURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyDeckBuilderURL.setText("編成をコピー(デッキビルダーURL)");
+        copyDeckBuilderURL.setText("編成をコピー(デッキビルダー URL)");
 
         copyDeckBuilderURL.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean[] isUseCopyDeckBuilder = {
+                boolean[] isUseCopyDeckBuilders = {
                         AppConfig.get().isUseCopyDeckBuilder1(),
                         AppConfig.get().isUseCopyDeckBuilder2(),
                         AppConfig.get().isUseCopyDeckBuilder3(),
                         AppConfig.get().isUseCopyDeckBuilder4() };
                 if (GlobalContext.getState() == 1) {
                     Clipboard clipboard = new Clipboard(Display.getDefault());
-                    clipboard.setContents(new Object[] { DeckBuilder.toDeckBuilderURL(isUseCopyDeckBuilder) },
+                    clipboard.setContents(new Object[] { DeckBuilder.toDeckBuilderURL(isUseCopyDeckBuilders) },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1226,22 +1227,21 @@ public final class ApplicationMain extends WindowBase {
             }
         });
         final MenuItem copyKcToolsURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyKcToolsURL.setText("編成をコピー(制空権シミュレータURL)");
+        copyKcToolsURL.setText("編成をコピー(制空権シミュレータ URL)");
 
         copyKcToolsURL.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean[] isUseCopyDeckBuilder = {
+                boolean[] isUseCopyDeckBuilders = {
                         AppConfig.get().isUseCopyDeckBuilder1(),
                         AppConfig.get().isUseCopyDeckBuilder2(),
                         AppConfig.get().isUseCopyDeckBuilder3(),
                         AppConfig.get().isUseCopyDeckBuilder4() };
                 if (GlobalContext.getState() == 1) {
-                    boolean isUseEventAirbase = AppConfig.get().isUseEventAirbase();
+                    int areaId = AppConfig.get().getUseAirbaseAreaId();
                     Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(
-                            new Object[] { DeckBuilder.toKcToolsBuilderURL(isUseCopyDeckBuilder,
-                                    isUseEventAirbase) },
+                            new Object[] { DeckBuilder.toKcToolsURL(isUseCopyDeckBuilders, areaId) },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1254,23 +1254,22 @@ public final class ApplicationMain extends WindowBase {
                 }
             }
         });
-        final MenuItem copyJervisORURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyJervisORURL.setText("編成をコピー(作戦室JervisOR URL)");
+        final MenuItem copyFleetHubURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
+        copyFleetHubURL.setText("編成をコピー(作戦室 URL)");
 
-        copyJervisORURL.addSelectionListener(new SelectionAdapter() {
+        copyFleetHubURL.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean[] isUseCopyDeckBuilder = {
+                boolean[] isUseCopyDeckBuilders = {
                         AppConfig.get().isUseCopyDeckBuilder1(),
                         AppConfig.get().isUseCopyDeckBuilder2(),
                         AppConfig.get().isUseCopyDeckBuilder3(),
                         AppConfig.get().isUseCopyDeckBuilder4() };
                 if (GlobalContext.getState() == 1) {
-                    boolean isUseEventAirbase = AppConfig.get().isUseEventAirbase();
+                    int areaId = AppConfig.get().getUseAirbaseAreaId();
                     Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(
-                            new Object[] { DeckBuilder.toJervisORBuilderURL(isUseCopyDeckBuilder,
-                                    isUseEventAirbase) },
+                            new Object[] { DeckBuilder.toFleetHubURL(isUseCopyDeckBuilders, areaId) },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1285,13 +1284,32 @@ public final class ApplicationMain extends WindowBase {
         });
 
         new MenuItem(copyDeckBuilderMenu, SWT.SEPARATOR);
-        final MenuItem useEventAirbase = new MenuItem(copyDeckBuilderMenu, SWT.CHECK);
+        int areaId = AppConfig.get().getUseAirbaseAreaId();
+        final MenuItem use6thAreaAirbase = new MenuItem(copyDeckBuilderMenu, SWT.RADIO);
+        use6thAreaAirbase.setText("第六海域の基地を使用");
+        use6thAreaAirbase.setSelection(areaId == 6);
+        use6thAreaAirbase.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseAirbaseAreaId(6);
+            }
+        });
+        final MenuItem use7thAreaAirbase = new MenuItem(copyDeckBuilderMenu, SWT.RADIO);
+        use7thAreaAirbase.setText("第七海域の基地を使用");
+        use7thAreaAirbase.setSelection(areaId == 7);
+        use7thAreaAirbase.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseAirbaseAreaId(7);
+            }
+        });
+        final MenuItem useEventAirbase = new MenuItem(copyDeckBuilderMenu, SWT.RADIO);
         useEventAirbase.setText("イベント海域の基地を使用");
-        useEventAirbase.setSelection(AppConfig.get().isUseEventAirbase());
+        useEventAirbase.setSelection(areaId == 0);
         useEventAirbase.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AppConfig.get().setUseEventAirbase(useEventAirbase.getSelection());
+                AppConfig.get().setUseAirbaseAreaId(0);
             }
         });
         new MenuItem(copyDeckBuilderMenu, SWT.SEPARATOR);
@@ -1446,7 +1464,7 @@ public final class ApplicationMain extends WindowBase {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Clipboard clipboard = new Clipboard(Display.getDefault());
-                clipboard.setContents(new Object[] { "https://kancolle-fleetanalysis.firebaseapp.com/#/equipInput" },
+                clipboard.setContents(new Object[] { "https://noro6.github.io/kc-web/#/manager" },
                         new Transfer[] { TextTransfer.getInstance() });
             }
         });
@@ -2324,61 +2342,98 @@ public final class ApplicationMain extends WindowBase {
     }
 
     public void updateAirbase(boolean isMinimumLayout) {
-        Optional.ofNullable(GlobalContext.getAirbase()).ifPresent(airbase -> {
-            int select = this.airbaseCombo.getSelectionIndex();
-            this.airbaseCombo.removeAll();
-            airbase.get().forEach((key, value) -> {
-                String result = "#" + key + " - " + String.join(" ", value.values().stream()
-                        .map(v -> "[" + v.getActionKindString() + "/" + v.getDistance() + "]:"
-                                + v.getAirPower().toString())
-                        .toArray(String[]::new));
-                String miniResult = "#" + key + " - " + String.join(" ", value.values().stream()
-                        .map(v -> "[" + v.getActionKindString().substring(0, 1) + "/" + v.getDistance() + "]")
-                        .toArray(String[]::new));
-                this.airbaseCombo.add(isMinimumLayout ? miniResult : result);
-            });
-            if (airbase.get().size() > 0) {
-                this.airbaseCombo.select(select < 0 && select < airbase.get().size() ? 0 : select);
-            }
+        Map<Integer, List<AirbaseDto>> airbaseMap = GlobalContext.getAirbases().stream()
+                .collect(Collectors.groupingBy(airbase -> airbase.getAreaId()));
+        int select = this.airbaseCombo.getSelectionIndex();
+        this.airbaseCombo.removeAll();
+        airbaseMap.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey())).forEach(e -> {
+            int areaId = e.getKey();
+            List<AirbaseDto> airbases = e.getValue().stream()
+                    .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid()))
+                    .collect(Collectors.toList());
 
-            String result = "";
-            int area = Integer.parseInt(
-                    this.airbaseCombo.getItem(this.airbaseCombo.getSelectionIndex()).replaceAll("#(\\d*).*", "$1"));
-            Map<Integer, AirbaseDto.AirCorpsDto> airCorps = airbase.get().get(area);
-            AirPower normalAirPower = airCorps.values().stream().filter(airCorp -> {
-                return airCorp.getActionKind() == 2;
-            }).map(airCorp -> {
-                return airCorp.getAirPower();
-            }).reduce(new AirPower(0), (sum, elm) -> {
-                sum.add(elm);
-                return sum;
-            });
-            AirPower highAltitudeInterceptionAirPower = AirbaseDto.getHighAltitudeInterceptionAirPower(airCorps);
-            result += "[合計防空制空値(通常)]:" + normalAirPower + "\r\n";
-            result += "[合計防空制空値(高高度)]:" + highAltitudeInterceptionAirPower + "\r\n" + "\r\n";
-            for (final int airId : airCorps.keySet().stream().sorted().collect(Collectors.toList())) {
-                AirbaseDto.AirCorpsDto airCorp = airCorps.get(airId);
-                result += "#" + area + "-" + airId + " " + "[" + airCorp.getActionKindString() + "]" + airCorp.getName()
-                        + "\r\n";
-                result += "制空値:" + airCorp.getAirPower() + " 半径:" + airCorp.getDistance() + "\r\n";
-                for (final int sqId : airCorp.getSquadrons().keySet().stream().sorted().collect(Collectors.toList())) {
-                    int now = airCorp.getSquadrons().get(sqId).getCount();
-                    int max = airCorp.getSquadrons().get(sqId).getMaxCount();
-                    int slotid = airCorp.getSquadrons().get(sqId).getSlotid();
-                    if (slotid > 0) {
-                        ItemDto item = GlobalContext.getItem(slotid);
-                        result += "[" + now + "/" + max + "]:" + item.getName()
-                                + getLevelString(item.getLevel()) + " " + getAlvString(item.getAlv())
-                                + " (半径:" + item.getParam().getDistance() + ")\r\n";
-                    }
-                    else {
-                        result += "(なし)\r\n";
-                    }
-                }
-                result += "\r\n";
+            if (isMinimumLayout) {
+                String miniResult = "#" + areaId + " - " + String.join(" ", airbases.stream()
+                        .map(airbase -> "[" + airbase.toActionKindString().substring(0, 1) + "/" + airbase.getDistance()
+                                + "]")
+                        .toArray(String[]::new));
+                this.airbaseCombo.add(miniResult);
             }
-            this.airbaseCombo.setToolTipText(result);
+            else {
+                String result = "#" + areaId + " - " + String.join(" ", airbases.stream()
+                        .map(airbase -> {
+                            AirPower airPower = new AirPower(0);
+                            switch (airbase.getActionKind()) {
+                            case 2:
+                                airPower = AirbaseSeikuString.getDefenseAirPower(airbase.getPlaneInfos());
+                                break;
+                            default:
+                                airPower = AirbaseSeikuString.getSortieAirPower(airbase.getPlaneInfos());
+                                break;
+                            }
+
+                            return "[" + airbase.toActionKindString() + "/" + airbase.getDistance() + "]:"
+                                    + airPower.toString();
+                        })
+                        .toArray(String[]::new));
+                this.airbaseCombo.add(result);
+            }
         });
+        if (airbaseMap.size() > 0) {
+            this.airbaseCombo.select(select < 0 && select < airbaseMap.size() ? 0 : select);
+        }
+
+        String result = "";
+        int areaId = Integer.parseInt(
+                this.airbaseCombo.getItem(this.airbaseCombo.getSelectionIndex()).replaceAll("#(\\d*).*", "$1"));
+        List<AirbaseDto> areaAirbases = airbaseMap.get(areaId);
+        AirPower defenseAirPower = areaAirbases.stream().filter(airbase -> airbase.getActionKind() == 2)
+                .map(airbase -> AirbaseSeikuString.getDefenseAirPower(airbase.getPlaneInfos()))
+                .reduce(new AirPower(0), (accum, value) -> {
+                    accum.add(value);
+                    return accum;
+                });
+        result += "[合計防空制空値(通常)]:" + defenseAirPower.toString() + "\r\n";
+        List<SquadronDto> defenseSquadrons = areaAirbases.stream().filter(airbase -> airbase.getActionKind() == 2)
+                .flatMap(airbase -> airbase.getPlaneInfos().stream()).collect(Collectors.toList());
+        result += "[合計防空制空値(高高度)]:" + AirbaseSeikuString.getHighDefenseAirPower(defenseSquadrons).toString() + "\r\n"
+                + "\r\n";
+
+        List<AirbaseDto> airbases = areaAirbases.stream()
+                .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid())).collect(Collectors.toList());
+        for (AirbaseDto airbase : airbases) {
+            result += "#" + airbase.getAreaId() + "-" + airbase.getRid() + " " + "[" + airbase.toActionKindString()
+                    + "]" + airbase.getName()
+                    + "\r\n";
+            List<SquadronDto> planeInfos = airbase.getPlaneInfos().stream()
+                    .sorted(Comparator.comparing(planeInfo -> ((SquadronDto) planeInfo).getSquadronId()))
+                    .collect(Collectors.toList());
+            AirPower airPower = new AirPower(0);
+            switch (airbase.getActionKind()) {
+            case 2:
+                airPower = AirbaseSeikuString.getDefenseAirPower(airbase.getPlaneInfos());
+                break;
+            default:
+                airPower = AirbaseSeikuString.getSortieAirPower(airbase.getPlaneInfos());
+                break;
+            }
+            result += "制空値:" + airPower.toString() + " 半径:" + airbase.getDistance() + "\r\n";
+            for (SquadronDto planeInfo : planeInfos) {
+                int now = planeInfo.getCount();
+                int max = planeInfo.getMaxCount();
+                int slotitemId = planeInfo.getSlotitemId();
+                if (slotitemId > 0) {
+                    result += "[" + now + "/" + max + "]:" + planeInfo.getName()
+                            + toLevelString(planeInfo.getLevel()) + " " + toAlvString(planeInfo.getAlv())
+                            + " (半径:" + planeInfo.getParam().getDistance() + ")\r\n";
+                }
+                else {
+                    result += "(なし)\r\n";
+                }
+            }
+            result += "\r\n";
+        }
+        this.airbaseCombo.setToolTipText(result);
     }
 
     public void updateMapHpInfo() {
@@ -2426,7 +2481,7 @@ public final class ApplicationMain extends WindowBase {
         });
     }
 
-    private String getAlvString(int alv) {
+    private String toAlvString(int alv) {
         switch (alv) {
         case 1:
             return "|";
@@ -2446,7 +2501,7 @@ public final class ApplicationMain extends WindowBase {
         return "";
     }
 
-    private String getLevelString(int lv) {
+    private String toLevelString(int lv) {
         return lv > 0 ? "+" + lv : "";
     }
 

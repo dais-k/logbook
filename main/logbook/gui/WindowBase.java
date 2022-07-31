@@ -238,9 +238,9 @@ public class WindowBase {
             return this.getRoot().animation.getHoverAware();
         }
 
-        public int getAlpha() {
-            return this.getRoot().animation.getAlpha();
-        }
+        // public int getAlpha() {
+        //     return this.getRoot().animation.getAlpha();
+        // }
 
         @Override
         public boolean isMouseHovering() {

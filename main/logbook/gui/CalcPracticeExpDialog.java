@@ -171,11 +171,11 @@ public final class CalcPracticeExpDialog extends WindowBase {
             }
         }
 
-        ShipLvListener firstShipLvListener = new ShipLvListener(this.firstShipLevel);
+        ShipLvListener firstShipLvListener = new ShipLvListener();
         this.firstShipLevel.addSelectionListener(firstShipLvListener);
         this.firstShipLevel.addMouseWheelListener(new WheelListener(this.firstShipLevel, firstShipLvListener));
 
-        ShipLvListener secondShipLvListener = new ShipLvListener(this.secondShipLevel);
+        ShipLvListener secondShipLvListener = new ShipLvListener();
         this.secondShipLevel.addSelectionListener(secondShipLvListener);
         this.secondShipLevel.addMouseWheelListener(new WheelListener(this.secondShipLevel, secondShipLvListener));
 
@@ -265,12 +265,6 @@ public final class CalcPracticeExpDialog extends WindowBase {
      *
      */
     private final class ShipLvListener extends SelectionAdapter {
-        private final Spinner shiplv;
-
-        private ShipLvListener(Spinner shiplv) {
-            this.shiplv = shiplv;
-        }
-
         @Override
         public void widgetSelected(SelectionEvent e) {
             CalcPracticeExpDialog.this.calc();

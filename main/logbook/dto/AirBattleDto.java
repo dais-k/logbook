@@ -200,6 +200,14 @@ public class AirBattleDto {
                 return "40:Atlanta砲x2/GFCS";
             case 41:
                 return "41:Atlanta砲x2";
+            case 42:
+                return "42:高角砲群集中配備x2/機銃/大和型電探";
+            case 43:
+                return "43:高角砲群集中配備x2/大和型電探";
+            case 44:
+                return "44:高角砲群集中配備/機銃/大和型電探";
+            case 45:
+                return "45:高角砲群集中配備/大和型電探";
         }
         return "不明(" + id + ")";
     }

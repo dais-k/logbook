@@ -49,16 +49,16 @@ public class CalcAA {
             this.put(21, new AA_CI(5, 1.45));  // 高角砲/対空電探(由良改二)
             this.put(22, new AA_CI(2, 1.2));   // 特殊機銃(文月改二)
             this.put(23, new AA_CI(1, 1.05));  // 機銃(非特殊機銃)(UIT-25/伊504)
-            this.put(24, new AA_CI(3, 1.25));  // 高角砲/機銃(非特殊機銃)(龍田改二)
+            this.put(24, new AA_CI(3, 1.25));  // 高角砲/機銃(非特殊機銃)(天龍型改二)
             this.put(25, new AA_CI(7, 1.55));  // 新噴進砲/対空電探/三式弾(伊勢型改)
-            this.put(26, new AA_CI(6, 1.4));   // 10cm連装高角砲改＋増設機銃/対空電探(武蔵改二)
+            this.put(26, new AA_CI(6, 1.4));   // 10cm連装高角砲改＋増設機銃/対空電探(大和型改二)
             this.put(27, new AA_CI(0, 1));     //
             this.put(28, new AA_CI(4, 1.4));   // 新噴進砲/対空電探(伊勢型改/武蔵改)
             this.put(29, new AA_CI(5, 1.55));  // 高角砲/対空電探(浜風乙改/磯風乙改)
             this.put(30, new AA_CI(3, 1.3));   // 高角砲x3(天龍改二/Gotland改)
             this.put(31, new AA_CI(2, 1.25));  // 高角砲x2(天龍改二)
             this.put(32, new AA_CI(3, 1.2));   // [16inch Mk.I三連装砲改+FCR type284 or 20連装7inch UP Rocket Launchers/QF 2ポンド8連装ポンポン砲] or [20連装7inch UP Rocket Launchersx2](英国艦/金剛型改二)
-            this.put(33, new AA_CI(3, 1.35));  // 高角砲/機銃(Gotland改)
+            this.put(33, new AA_CI(3, 1.35));  // 高角砲/機銃(対空4以上)(Gotland改)
             this.put(34, new AA_CI(7, 1.6));   // 5inch単装砲 Mk.30改+GFCS Mk.37x2(Johnston)
             this.put(35, new AA_CI(6, 1.55));  // 5inch単装砲 Mk.30改+GFCS Mk.37/5inch単装砲 Mk.30改(Johnston)
             this.put(36, new AA_CI(6, 1.55));  // 5inch単装砲 Mk.30改x2/GFCS Mk.37(Johnston)
@@ -67,6 +67,10 @@ public class CalcAA {
             this.put(39, new AA_CI(10, 1.7));  // GFCS Mk.37+5inch連装両用砲(集中配備)/5inch連装両用砲(集中配備)(Atlanta)
             this.put(40, new AA_CI(10, 1.7));  // 5inch連装両用砲(集中配備)x2/GFCS Mk.37(Atlanta)
             this.put(41, new AA_CI(9, 1.65));  // 5inch連装両用砲(集中配備)x2(Atlanta)
+            this.put(42, new AA_CI(10, 1.65)); // 10cm連装高角砲群 集中配備x2/機銃(対空6以上)/大和型電探(大和型改二)
+            this.put(43, new AA_CI(8, 1.6));   // 10cm連装高角砲群 集中配備x2/大和型電探(大和型改二)
+            this.put(44, new AA_CI(6, 1.6));   // 10cm連装高角砲群 集中配備/機銃(対空6以上)/大和型電探(大和型改二)
+            this.put(45, new AA_CI(5, 1.55));  // 10cm連装高角砲群 集中配備/大和型電探(大和型改二)
         }
     };
 

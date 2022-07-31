@@ -425,6 +425,12 @@ public final class AppConfigBean {
     /** イベント基地を使用するか */
     private boolean isUseEventAirbase = true;
 
+    /** どの基地を使用するか */
+    private int useAirbaseAreaId = 0;
+
+    /** マップのアルファベット表示を使用するか */
+    private boolean isUseAlphabetizeMap = false;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -2376,5 +2382,21 @@ public final class AppConfigBean {
 
     public void setUseEventAirbase(boolean isUseEventAirbase) {
         this.isUseEventAirbase = isUseEventAirbase;
+    }
+
+    public int getUseAirbaseAreaId() {
+        return this.useAirbaseAreaId;
+    }
+
+    public void setUseAirbaseAreaId(int useAirbaseAreaId) {
+        this.useAirbaseAreaId = useAirbaseAreaId;
+    }
+
+    public boolean isUseAlphabetizeMap() {
+        return this.isUseAlphabetizeMap;
+    }
+
+    public void setUseAlphabetizeMap(boolean isUseAlphabetizeMap) {
+        this.isUseAlphabetizeMap = isUseAlphabetizeMap;
     }
 }

@@ -24,7 +24,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "2.5.7.33";
+    public static final String VERSION = "2.5.7.34";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("https://github.com/Nishisonic/logbook/releases");
@@ -32,6 +32,9 @@ public class AppConstants {
     /** アップデートチェック先 */
     public static final URI UPDATE_CHECK_URI = URI
             .create("https://api.github.com/repos/Nishisonic/logbook/releases/latest");
+
+    /** マップセル */
+    public static final URI MAP_EDGES_URI = URI.create("https://raw.githubusercontent.com/KC3Kai/KC3Kai/master/src/data/edges.json");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";

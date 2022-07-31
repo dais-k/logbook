@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import logbook.dto.ShipInfoDto;
-import logbook.internal.MasterData;
 import logbook.internal.Ship;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +23,7 @@ public class ShipInfoToCSV {
      * @throws IOException 
      */
     public static void main(String[] args) throws IOException {
-        boolean init = MasterData.INIT_COMPLETE;
+        // boolean init = MasterData.INIT_COMPLETE;
         OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream("shipInfo.csv"), "MS932");
 
         fw.write(StringUtils.join(new String[] {

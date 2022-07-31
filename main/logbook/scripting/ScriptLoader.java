@@ -373,7 +373,7 @@ public class ScriptLoader {
         File ignoreFile = new File(AppConstants.SCRIPT_DIR + "/ignore_update.txt");
         if (ignoreFile.exists()) {
             try {
-                for (String filename : FileUtils.readLines(ignoreFile)) {
+                for (String filename : FileUtils.readLines(ignoreFile, Charset.defaultCharset())) {
                     ignoreList.add(filename);
                 }
             } catch (IOException e) {

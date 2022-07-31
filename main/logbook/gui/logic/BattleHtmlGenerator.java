@@ -3,10 +3,12 @@
  */
 package logbook.gui.logic;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.dto.*;
 import logbook.dto.BattleExDto.Phase;
 import logbook.internal.Item;
+import logbook.internal.MapEdges;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -121,7 +123,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      * @param hp
      * @param phaseName
      */
-    @SuppressWarnings("unchecked")
     private <SHIP extends ShipBaseDto> void genParmeters(String tableTitle,
             List<SHIP> ships, int[][] hp, String[] phaseName, int hqLv, boolean isSecond, String[] formation,
             List<SHIP> allShips, BattleExDto battle) {
@@ -430,6 +431,67 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // p
     }
 
+    /**
+     * 装備テーブルを生成
+     *
+     * @param airbases
+     */
+    private void genAirbaseSlotitemTable(List<AirbaseDto> airbases, MapCellDto mapCellDto,
+            StartAirbaseDto startAirbase) {
+        this.begin("div", BOX_CLASS);
+        this.begin("table", SLOTITEM_TABLE_CLASS[0]);
+
+        this.begin("tr", null);
+        this.inline("th", "基地航空隊", null);
+        this.inline("th", "行動", null);
+        for (int i = 1; i <= 4; ++i) {
+            this.inline("th", getColSpan(2), "第" + i + "中隊", null);
+        }
+        this.end(); // tr
+
+        for (int i = 0; i < airbases.size(); ++i) {
+            this.begin("tr", null);
+            AirbaseDto airbase = airbases.get(i);
+            this.inline("td", "第" + (i + 1) + "航空隊", null);
+            String strikePoint = "";
+            if (airbase.getActionKind() == 1 && Objects.nonNull(startAirbase)
+                    && Objects.nonNull(startAirbase.getStrikePoint(i + 1))) {
+                String[] mapEdge = MapEdges.get(mapCellDto.getMap());
+                if (AppConfig.get().isUseAlphabetizeMap() && Objects.nonNull(mapEdge) && mapEdge.length > 1) {
+                    strikePoint = "(" + Arrays.stream(startAirbase.getStrikePoint(i + 1)).mapToObj(j -> {
+                        return mapEdge[1] + "(" + ((Integer) j).toString() + ")";
+                    }).collect(Collectors.joining(",")) + ")";
+                }
+                else {
+                    strikePoint = "(" + Arrays.stream(startAirbase.getStrikePoint(i + 1))
+                            .mapToObj(j -> ((Integer) j).toString()).collect(Collectors.joining(",")) + ")";
+                }
+            }
+
+            this.inline("td", airbase.toActionKindString() + strikePoint, null);
+            List<SquadronDto> sqs = airbase.getPlaneInfos();
+            for (int c = 0; c < 4; ++c) {
+                SquadronDto sq = sqs.get(c);
+                String onSlot = "";
+                String itemName = "";
+                String tooltip = "";
+                if (Objects.nonNull(sq)) {
+                    onSlot += sq.getCount() + "/" + sq.getMaxCount();
+                    itemName += sq.getFriendlyName();
+                    tooltip += getItemParamTooltipContents(sq);
+                }
+
+                this.inline("td title='" + tooltip + "'", itemName, null);
+                this.inline("td", onSlot, null);
+            }
+            this.end(); // tr
+        }
+
+        this.end(); // table
+        this.inline("div", "※機数は出撃時点のものになります(空襲結果は反映されません)", null);
+        this.end(); // p
+    }
+
     private String getItemParamTooltipContents(ItemDto item) {
         String description = "";
         if (Objects.nonNull(item)) {
@@ -638,7 +700,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             int[] originHp;
             int[] maxOriginHp;
             int[] targetHp;
-            int[] maxTargetHp;
+            // int[] maxTargetHp;
             String[] text;
             String[][] textClass;
             String[][] damageClass;
@@ -649,7 +711,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 maxOriginHp = maxFriendHp;
                 target = enemyShips;
                 targetHp = enemyHp;
-                maxTargetHp = maxEnemyHp;
+                // maxTargetHp = maxEnemyHp;
                 text = new String[] { "自軍", "敵軍" };
                 textClass = TEXT_CLASS[0];
                 damageClass = DAMAGE_CLASS[0];
@@ -660,7 +722,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 maxOriginHp = maxEnemyHp;
                 target = friendShips;
                 targetHp = friendHp;
-                maxTargetHp = maxFriendHp;
+                // maxTargetHp = maxFriendHp;
                 text = new String[] { "敵軍", "自軍" };
                 textClass = TEXT_CLASS[1];
                 damageClass = DAMAGE_CLASS[1];
@@ -1059,6 +1121,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.end();
             this.inline("h3", "自軍攻撃", null);
         }
+
+        if (phase.getAirBaseInjection() != null || phase.getAirBase() != null) {
+            this.inline("h3", "基地航空隊", null);
+            this.genAirbaseSlotitemTable(battle.getAirbases(), battle.getMapCellDto(), battle.getStartAirbase());
+        }
+
         // 基地航空隊(噴式)
         AirBattleDto airBaseInjection = phase.getAirBaseInjection();
         if (airBaseInjection != null) {

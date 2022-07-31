@@ -145,7 +145,6 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     /**
      * 更新する必要のあるデータ
      */
-    @SuppressWarnings("incomplete-switch")
     @Override
     public void update(DataType type, Data data) {
         if (ReportUtils.isShipUpdate(type)) {

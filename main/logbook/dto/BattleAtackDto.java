@@ -503,6 +503,10 @@ public class BattleAtackDto {
         case 301:
         case 302:
             return "潜水艦隊攻撃";
+        case 400:
+            return "大和、突撃します！二番艦も続いてください！";
+        case 401:
+            return "第一戦隊、突撃！主砲、全力斉射ッ！";
         }
         return "不明(" + this.type + ")";
     }
@@ -557,6 +561,10 @@ public class BattleAtackDto {
         case 301:
         case 302:
             return "潜水艦隊攻撃";
+        case 400:
+            return "大和、突撃します！二番艦も続いてください！";
+        case 401:
+            return "第一戦隊、突撃！主砲、全力斉射ッ！";
         }
         return "不明(" + this.type + ")";
     }

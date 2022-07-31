@@ -162,7 +162,7 @@ public final class PushNotify {
                     }
                 }
             }
-            if (postflag = false) {
+            if (postflag == false) {
                 LOG.get().warn("ImKayac による Push 通知に失敗しました", result);
             }
         } catch (Exception e) {
@@ -205,7 +205,7 @@ public final class PushNotify {
                     }
                 }
             }
-            if (postflag = false) {
+            if (postflag == false) {
                 LOG.get().warn("Pushover による Push 通知に失敗しました", result);
             }
         } catch (Exception e) {
@@ -238,7 +238,7 @@ public final class PushNotify {
                     }
                 }
             }
-            if (postflag = false) {
+            if (postflag == false) {
                 LOG.get().warn("LINE による 通知に失敗しました", result);
             }
         } catch (Exception e) {

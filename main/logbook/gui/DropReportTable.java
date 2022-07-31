@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -131,7 +132,6 @@ public final class DropReportTable extends AbstractTableDialog {
             filter.addSelectionListener(filterListener);
         }
         SelectionListener deckbuilderListener = new SelectionAdapter() {
-            @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int selected = DropReportTable.this.table.getSelectionIndex();
@@ -143,10 +143,74 @@ public final class DropReportTable extends AbstractTableDialog {
                     List<ShipDto> ships = detail.getDock().getShips();
                     if (detail.isCombined()) {
                         List<ShipDto> shipsCombined = detail.getDockCombined().getShips();
-                        data = DeckBuilder.toDeckBuilderURL(ships, shipsCombined);
+                        data = DeckBuilder.toDeckBuilderURL(Arrays.asList(ships, shipsCombined));
                     }
                     else {
-                        data = DeckBuilder.toDeckBuilderURL(ships);
+                        data = DeckBuilder.toDeckBuilderURL(Arrays.asList(ships));
+                    }
+                    if (GlobalContext.getState() == 1) {
+                        Clipboard clipboard = new Clipboard(Display.getDefault());
+                        clipboard.setContents(new Object[] { data }, new Transfer[] { TextTransfer.getInstance() });
+                    }
+                    else {
+                        Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                        MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                        mes.setText(AppConstants.TITLEBAR_TEXT);
+                        mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                        mes.open();
+                        shell.dispose();
+                    }
+                }
+            }
+        };
+        SelectionListener kcToolsListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int selected = DropReportTable.this.table.getSelectionIndex();
+                if (selected != -1) {
+                    BattleResultDto result = DropReportTable.this.getItemFromIndex(selected);
+                    BattleExDto detail = BattleResultServer.get().getBattleDetail(result);
+                    String data = null;
+
+                    List<ShipDto> ships = detail.getDock().getShips();
+                    if (detail.isCombined()) {
+                        List<ShipDto> shipsCombined = detail.getDockCombined().getShips();
+                        data = DeckBuilder.toKcToolsURL(Arrays.asList(ships, shipsCombined), detail.getAirbases());
+                    }
+                    else {
+                        data = DeckBuilder.toKcToolsURL(Arrays.asList(ships), detail.getAirbases());
+                    }
+                    if (GlobalContext.getState() == 1) {
+                        Clipboard clipboard = new Clipboard(Display.getDefault());
+                        clipboard.setContents(new Object[] { data }, new Transfer[] { TextTransfer.getInstance() });
+                    }
+                    else {
+                        Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                        MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                        mes.setText(AppConstants.TITLEBAR_TEXT);
+                        mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                        mes.open();
+                        shell.dispose();
+                    }
+                }
+            }
+        };
+        SelectionListener fleetHubListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int selected = DropReportTable.this.table.getSelectionIndex();
+                if (selected != -1) {
+                    BattleResultDto result = DropReportTable.this.getItemFromIndex(selected);
+                    BattleExDto detail = BattleResultServer.get().getBattleDetail(result);
+                    String data = null;
+
+                    List<ShipDto> ships = detail.getDock().getShips();
+                    if (detail.isCombined()) {
+                        List<ShipDto> shipsCombined = detail.getDockCombined().getShips();
+                        data = DeckBuilder.toFleetHubURL(Arrays.asList(ships, shipsCombined), detail.getAirbases());
+                    }
+                    else {
+                        data = DeckBuilder.toFleetHubURL(Arrays.asList(ships), detail.getAirbases());
                     }
                     if (GlobalContext.getState() == 1) {
                         Clipboard clipboard = new Clipboard(Display.getDefault());
@@ -180,8 +244,7 @@ public final class DropReportTable extends AbstractTableDialog {
             public void run() {
                 try {
                     DropReportTable.this.reloadTable();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.get().warn("ドロップ報告書の更新に失敗", e);
                 }
             }
@@ -196,8 +259,14 @@ public final class DropReportTable extends AbstractTableDialog {
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
         final MenuItem deckbuilder = new MenuItem(this.tablemenu, SWT.NONE);
-        deckbuilder.setText("艦隊シミュレーター＆デッキビルダー用にコピー");
+        deckbuilder.setText("編成をコピー(デッキビルダー URL)");
         deckbuilder.addSelectionListener(deckbuilderListener);
+        final MenuItem kcTools = new MenuItem(this.tablemenu, SWT.NONE);
+        kcTools.setText("編成をコピー(制空権シミュレータ URL)");
+        kcTools.addSelectionListener(kcToolsListener);
+        final MenuItem fleetHub = new MenuItem(this.tablemenu, SWT.NONE);
+        fleetHub.setText("編成をコピー(作戦室 URL)");
+        fleetHub.addSelectionListener(fleetHubListener);
     }
 
     private BattleResultDto getItemFromIndex(int index) {

@@ -2,6 +2,7 @@ package logbook.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 import logbook.config.AppConfig;
@@ -185,7 +186,7 @@ public final class CreatePacFileDialog extends Dialog {
                 this.parent.firefoxPath.setText("file:///" + file.toURI().toString().replaceFirst("file:/", ""));
 
                 try {
-                    FileUtils.write(file, script);
+                    FileUtils.write(file, script, Charset.defaultCharset());
                 } catch (IOException e1) {
                     MessageBox errMessageBox = new MessageBox(this.shell, SWT.ICON_ERROR);
                     errMessageBox.setText("書き込めませんでした");

@@ -354,7 +354,6 @@ public final class ShipFilterComposite extends Composite {
              */
             @Override
             public void groupShipChanged(ShipGroupBean group) {
-                // TODO 自動生成されたメソッド・スタブ
 
             }
         };

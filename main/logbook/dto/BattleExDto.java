@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.json.JsonArray;
@@ -213,6 +214,12 @@ public class BattleExDto extends AbstractDto {
 
     private static Date date20170405;
 
+    @Tag(131)
+    private List<AirbaseDto> airbases = new ArrayList<>();
+
+    @Tag(132)
+    private StartAirbaseDto startAirbase;
+
     static {
         // 敵艦IDが+1000された日時
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
@@ -239,7 +246,7 @@ public class BattleExDto extends AbstractDto {
 
         @Tag(108)
         private final int[] nowFriendlyFleetHp;
-        
+
         @Tag(120)
         private final int[] maxFriendlyFleetHp;
 
@@ -355,30 +362,32 @@ public class BattleExDto extends AbstractDto {
 
             // 敵は連合艦隊の第二艦隊か？（敵連合艦隊夜戦で第二艦隊が相手の場合のみ）
             this.isEnemySecond = (object.containsKey("api_active_deck")
-                    ? (object.getJsonArray("api_active_deck").getInt(1) == 2) : false);
+                    ? (object.getJsonArray("api_active_deck").getInt(1) == 2)
+                    : false);
 
             // 自分は連合艦隊の第二艦隊か？（自連合艦隊 vs 敵連合艦隊の夜戦で
             // 自分が第二艦隊であることの確認）
             this.isFriendSecond = (object.containsKey("api_active_deck")
-                    ? (object.getJsonArray("api_active_deck").getInt(0) == 2) : false);
+                    ? (object.getJsonArray("api_active_deck").getInt(0) == 2)
+                    : false);
 
             // 払暁戦か？
             this.isNightToDay = (object.containsKey("api_day_flag")
-                    ? (object.getInt("api_day_flag") == 1) : false);
+                    ? (object.getInt("api_day_flag") == 1)
+                    : false);
 
             this.kind = kind;
             this.isNight = kind.isNight();
 
             // 友軍艦隊支援か？
-            this.isFriendFleet = (object.containsKey("api_friendly_battle")
-                    ? true : false);
+            this.isFriendFleet = object.containsKey("api_friendly_battle");
 
             this.nowFriendHp = beforeFriendHp.clone();
             this.nowEnemyHp = beforeEnemyHp.clone();
             this.nowFriendHpCombined = isFriendCombined ? beforeFriendHpCombined.clone() : null;
             this.nowEnemyHpCombined = isEnemyCombined ? beforeEnemyHpCombined.clone() : null;
 
-            int n[] = {0,0,0,0,0,0,0}; 
+            int n[] = { 0, 0, 0, 0, 0, 0, 0 };
 
             this.nowFriendlyFleetHp = n.clone();
             this.maxFriendlyFleetHp = n.clone();
@@ -399,30 +408,29 @@ public class BattleExDto extends AbstractDto {
                     this.ff.add(new EnemyShipDto(ffid, ffslot, ffparam, ffLevel.getInt(i)));
                 }
 
-
                 JsonArray ff_maxhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_maxhps");
                 JsonArray ff_nowhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_nowhps");
-                for (int i= baseidx; i< ff_maxhps.size(); i++) {
-                   this.maxFriendlyFleetHp[i] = ff_maxhps.getInt(i);
-                   this.nowFriendlyFleetHp[i] = ff_nowhps.getInt(i);
-                   this.beforeFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                for (int i = baseidx; i < ff_maxhps.size(); i++) {
+                    this.maxFriendlyFleetHp[i] = ff_maxhps.getInt(i);
+                    this.nowFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                    this.beforeFriendlyFleetHp[i] = ff_nowhps.getInt(i);
                 }
-            } 
+            }
 
             // 友軍艦隊 夜間触接および照明弾発射艦
             if (JsonUtils.hasKey(object, "api_friendly_battle")) {
                 JsonObject friendlyBattleObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
-                
+
                 JsonArray jsonfriendlyTouchPlane = JsonUtils.getJsonArray(friendlyBattleObj, "api_touch_plane");
                 if (jsonfriendlyTouchPlane != null) {
                     this.friendlytouchPlane = new int[] {
-                        Integer.parseInt(jsonfriendlyTouchPlane.get(0).toString()),
-                        Integer.parseInt(jsonfriendlyTouchPlane.get(1).toString())
-                        };
+                            Integer.parseInt(jsonfriendlyTouchPlane.get(0).toString()),
+                            Integer.parseInt(jsonfriendlyTouchPlane.get(1).toString())
+                    };
                 }
-                
+
                 JsonArray jsonfriendlyFlarePos = JsonUtils.getJsonArray(friendlyBattleObj, "api_flare_pos");
-                
+
                 if ((jsonfriendlyFlarePos != null) && (jsonfriendlyFlarePos != JsonValue.NULL)) {
                     this.friendlyflarePos = JsonUtils.getIntArray(friendlyBattleObj, "api_flare_pos");
                 }
@@ -469,7 +477,7 @@ public class BattleExDto extends AbstractDto {
                 JsonObject stage3 = JsonUtils.getJsonObject(friendly_kouku, "api_stage3");
                 if (stage3 != null) {
                     this.support_kouku = BattleAtackDto.makeSupport(baseidx,
-                        JsonUtils.getJsonArray(stage3, "api_edam"));
+                            JsonUtils.getJsonArray(stage3, "api_edam"));
                 }
             }
 
@@ -584,13 +592,11 @@ public class BattleExDto extends AbstractDto {
                     kind.isHougeki3Second(), this.isEnemySecond, true);
 
             if (this.isFriendFleet) {
-		JsonObject FriendObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
+                JsonObject FriendObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
                 this.hougeki_f = BattleAtackDto.makeHougeki(baseidx, battle.friendSecondBase,
                         JsonUtils.getJsonObject(FriendObj, "api_hougeki"),
                         false, false, false);
             }
-
-
 
             // 雷撃
             this.raigeki = BattleAtackDto.makeRaigeki(baseidx, battle.friendSecondBase,
@@ -624,7 +630,8 @@ public class BattleExDto extends AbstractDto {
                 // １つのjsonファイルの中に友軍艦隊の砲撃と自艦隊の砲撃の２つの処理が存在する場合
                 this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet, battle);
                 this.doAtack(this.hougeki, battle.friendSecondBase, false, battle);
-            } else {
+            }
+            else {
                 this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet, battle);
             }
 
@@ -923,11 +930,12 @@ public class BattleExDto extends AbstractDto {
                                     if (itemCombined == null)
                                         continue;
                                     if (itemCombined.getSlotitemId() == 42) { //応急修理要員
-                                        this.nowFriendHpCombined[target  - friendSecondBase] = (int) (shipCombined.getMaxhp() * 0.2);
+                                        this.nowFriendHpCombined[target
+                                                - friendSecondBase] = (int) (shipCombined.getMaxhp() * 0.2);
                                         break;
                                     }
                                     else if (itemCombined.getSlotitemId() == 43) { //応急修理女神
-                                        this.nowFriendHpCombined[target  - friendSecondBase] = shipCombined.getMaxhp();
+                                        this.nowFriendHpCombined[target - friendSecondBase] = shipCombined.getMaxhp();
                                         break;
                                     }
                                 }
@@ -991,25 +999,29 @@ public class BattleExDto extends AbstractDto {
          */
         public BattleAtackDto[][] getAtackSequence() {
             return new BattleAtackDto[][] {
-                    ((this.airBaseInjection == null) || (this.airBaseInjection.atacks == null)) ? null : this
-                            .toArray(this.airBaseInjection.atacks),
+                    ((this.airBaseInjection == null) || (this.airBaseInjection.atacks == null)) ? null
+                            : this
+                                    .toArray(this.airBaseInjection.atacks),
                     this.getAirBaseBattlesArray(),
                     (this.support_kouku == null) ? null : this.toArray(this.support_kouku),
-                    ((this.airInjection == null) || (this.airInjection.atacks == null)) ? null : this
-                            .toArray(this.airInjection.atacks),
+                    ((this.airInjection == null) || (this.airInjection.atacks == null)) ? null
+                            : this
+                                    .toArray(this.airInjection.atacks),
                     ((this.air == null) || (this.air.atacks == null)) ? null : this.toArray(this.air.atacks),
                     this.support == null ? null : this.toArray(this.support),
                     ((this.air2 == null) || (this.air2.atacks == null)) ? null : this.toArray(this.air2.atacks),
                     this.openingTaisen == null ? null : this.toArray(this.openingTaisen),
                     this.opening == null ? null : this.toArray(this.opening),
                     this.hougeki_n_1 == null ? null : this.toArray(this.hougeki_n_1),
-                    this.hougeki_n_2 == null ? null : this.toArray(this.hougeki_n_2),                   
+                    this.hougeki_n_2 == null ? null : this.toArray(this.hougeki_n_2),
                     this.hougeki == null ? null : this.toArray(this.hougeki),
                     this.hougeki1 == null ? null : this.toArray(this.hougeki1),
                     this.raigeki == null ? null : this.toArray(this.raigeki),
                     this.hougeki2 == null ? null : this.toArray(this.hougeki2),
                     this.hougeki3 == null ? null : this.toArray(this.hougeki3),
-                    this.hougeki_f == null ? null : this.hougeki_f.stream().filter(attack -> attack.friendAtack).toArray(BattleAtackDto[]::new), 
+                    this.hougeki_f == null ? null
+                            : this.hougeki_f.stream().filter(attack -> attack.friendAtack)
+                                    .toArray(BattleAtackDto[]::new),
             };
         }
 
@@ -1170,7 +1182,6 @@ public class BattleExDto extends AbstractDto {
         public boolean isFriendFleet() {
             return this.isFriendFleet;
         }
-
 
         /**
          * 触接機 [味方・敵] -1の場合は「触接なし」
@@ -1560,6 +1571,20 @@ public class BattleExDto extends AbstractDto {
                 this.maxEnemyHpCombined = null;
             }
 
+            // 基地航空隊
+            if (object.containsKey("api_air_base_attack")) {
+                MapCellDto mapCellDto = GlobalContext.getSortieMap();
+                if (mapCellDto != null) {
+                    int[] map = mapCellDto.getMap();
+                    if (map != null) {
+                        this.airbases = GlobalContext.getAirbases().stream().filter(airbase -> {
+                            return airbase.getAreaId() == map[0];
+                        }).collect(Collectors.toList());
+                        this.startAirbase = GlobalContext.getStartAirbase();
+                    }
+                }
+            }
+
             // 陣形
             if (object.containsKey("api_formation")) {
                 JsonArray formation = JsonUtils.getJsonArray(object, "api_formation");
@@ -1752,14 +1777,14 @@ public class BattleExDto extends AbstractDto {
                 // 退避艦は1始まりの模様
                 // 連合艦隊 護衛退避では退避艦と随行艦の情報
                 this.escapeInfo = new int[] {
-                    JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1,
-                    JsonUtils.getJsonArray(jsonEscape, "api_tow_idx").getInt(0) - 1
+                        JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1,
+                        JsonUtils.getJsonArray(jsonEscape, "api_tow_idx").getInt(0) - 1
                 };
             }
             else {
                 // 遊撃部隊 司令部施設の場合、退避艦１隻のみの情報となる
                 this.escapeInfo = new int[] {
-                    JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1
+                        JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1
                 };
             }
         }
@@ -2378,5 +2403,13 @@ public class BattleExDto extends AbstractDto {
      */
     public int getEnemySecondBase() {
         return ENEMY_SECOND_BASE;
+    }
+
+    public List<AirbaseDto> getAirbases() {
+        return this.airbases;
+    }
+
+    public StartAirbaseDto getStartAirbase() {
+        return this.startAirbase;
     }
 }

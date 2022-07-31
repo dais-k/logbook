@@ -36,7 +36,7 @@ public class BattleDataReadTest {
                 ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
                 // ランクが合っているかチェック
                 ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
-                if (!battle.getRank().equals(estimatedRank.rank())) {
+                if (!battle.getRank().rank().equals(estimatedRank.rank())) {
                     System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
                             + battle.getLastPhase().getRankCalcInfo(battle));
                     ++mismatch;
@@ -46,7 +46,6 @@ public class BattleDataReadTest {
             long after = System.currentTimeMillis();
             System.out.println("完了 " + mismatch + "/" + numData + "(" + (after - before) + " ms)");
         } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
         }
     }

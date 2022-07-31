@@ -132,7 +132,7 @@ public final class CreateReportLogic {
     public static List<Comparable[]> getBattleResultStoreBody(List<BattleExDto> results) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
-        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
+        // SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
 
         for (int i = 0; i < results.size(); i++) {
             BattleExDto battle = results.get(i);

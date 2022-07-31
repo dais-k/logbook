@@ -9,7 +9,6 @@ import logbook.dto.*;
 import logbook.gui.ApplicationMain;
 import logbook.gui.FleetWindow;
 import logbook.gui.logic.*;
-import logbook.gui.widgets.FleetComposite;
 import logbook.internal.*;
 import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.ScriptData;
@@ -677,7 +676,7 @@ public final class AsyncExecApplicationMain extends Thread {
             }
 
             // 泊地修理タイマー
-            Label akashiTimerLabel = this.main.getAkashiTimerLabel();
+            // Label akashiTimerLabel = this.main.getAkashiTimerLabel();
             Text akashiTimerText = this.main.getAkashiTimerTime();
 
             AkashiTimer akashiTimer = GlobalContext.getAkashiTimer();
@@ -774,8 +773,8 @@ public final class AsyncExecApplicationMain extends Thread {
      */
     private static final class UpdateFleetTabTask implements Runnable {
 
-        private static CTabItem[] tabItems = new CTabItem[4];
-        private static FleetComposite[] dockComposites = new FleetComposite[4];
+        // private static CTabItem[] tabItems = new CTabItem[4];
+        // private static FleetComposite[] dockComposites = new FleetComposite[4];
 
         private final ApplicationMain main;
 

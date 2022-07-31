@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 
 import logbook.gui.ApplicationMain;
 
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
@@ -26,7 +25,7 @@ public class WindowNativeSupport {
     private static int SWP_NOSIZE = 0x0001;
     private static int SWP_NOMOVE = 0x0002;
     private static int SWP_NOACTIVATE = 0x0010;
-    private static int SWP_NOOWNERZORDER = 0x0200;
+    // private static int SWP_NOOWNERZORDER = 0x0200;
     private static int GWL_STYLE = -16;
     private static int WS_CAPTION = 0x00C00000;
 
@@ -76,7 +75,7 @@ public class WindowNativeSupport {
 
         public void setBehindTo(Shell shell, Shell behindTo) {
             try {
-                Rectangle rect = shell.getBounds();
+                // Rectangle rect = shell.getBounds();
                 Object insertAfter = (behindTo != null) ? this.handleField.get(behindTo) : this.fromInt(HWND_TOP);
                 Object[] args = new Object[] {
                         this.handleField.get(shell), insertAfter, 0, 0, 0, 0,

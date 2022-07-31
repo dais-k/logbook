@@ -293,6 +293,11 @@ public final class ConfigDialog extends Dialog {
         colorSupport.setText("色覚サポート*");
         colorSupport.setSelection(AppConfig.get().isColorSupport());
 
+        final Button alphabetize = new Button(compositeSystem, SWT.CHECK);
+        alphabetize.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        alphabetize.setText("マップをアルファベット表示にする(Thanks for KC3改)");
+        alphabetize.setSelection(AppConfig.get().isUseAlphabetizeMap());
+
         final Combo systemWideShortcutKey;
         if (JIntellitypeWrapper.getInstance() != null) {
             final Label systemWideShortcutKeyLabel = new Label(compositeSystem, SWT.NONE);
@@ -1150,6 +1155,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setCheckDoit(checkDoit.getSelection());
                 AppConfig.get().setNameOnTitlebar(nameOnTitlebar.getSelection());
                 AppConfig.get().setColorSupport(colorSupport.getSelection());
+                AppConfig.get().setUseAlphabetizeMap(alphabetize.getSelection());
                 if (StringUtils.isNumeric(soundlevel.getText())) {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);

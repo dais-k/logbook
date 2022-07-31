@@ -1,5 +1,6 @@
 package logbook.gui.background;
 
+import java.io.IOException;
 import java.util.List;
 
 import logbook.config.AppConfig;
@@ -15,6 +16,7 @@ import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.LoggerHolder;
+import logbook.internal.MapEdges;
 import logbook.internal.MasterData;
 import logbook.internal.ShipParameterRecord;
 import logbook.server.proxy.ProxyServer;
@@ -66,17 +68,13 @@ public final class BackgroundInitializer extends Thread {
             success &= ShipParameterRecord.INIT_COMPLETE; // ShipParameterRecord
 
             if (success) {
-                this.display.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (ShipInfoDto ship : MasterData.getMaster().getShips().values()) {
-                                ShipParameterRecord.update(ship, null);
-                            }
+                this.display.asyncExec(() -> {
+                    try {
+                        for (ShipInfoDto ship : MasterData.getMaster().getShips().values()) {
+                            ShipParameterRecord.update(ship, null);
                         }
-                        catch (Exception e) {
-                            LOG.get().warn("データ更新でエラー", e);
-                        }
+                    } catch (Exception e) {
+                        LOG.get().warn("データ更新でエラー", e);
                     }
                 });
             }
@@ -90,19 +88,16 @@ public final class BackgroundInitializer extends Thread {
 
         try {
             // 遠征ログ
-            final List<MissionResultDto> missionResultList = AppConfig.get().isLoadMissionLog() ?
-                    CreateReportLogic.loadMissionReport() : null;
+            final List<MissionResultDto> missionResultList = AppConfig.get().isLoadMissionLog()
+                    ? CreateReportLogic.loadMissionReport()
+                    : null;
             if (missionResultList != null) {
-                this.display.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            GlobalContext.addMissionResultList(missionResultList);
-                            ApplicationMain.logPrint("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
-                        }
-                        catch (Exception e) {
-                            LOG.get().warn("GUI更新でエラー", e);
-                        }
+                this.display.asyncExec(() -> {
+                    try {
+                        GlobalContext.addMissionResultList(missionResultList);
+                        ApplicationMain.logPrint("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
+                    } catch (Exception e) {
+                        LOG.get().warn("GUI更新でエラー", e);
                     }
                 });
             }
@@ -112,19 +107,16 @@ public final class BackgroundInitializer extends Thread {
 
         try {
             // 建造ログ
-            final List<GetShipDto> createShipList = AppConfig.get().isLoadCreateShipLog() ?
-                    CreateReportLogic.loadCreateShipReport() : null;
+            final List<GetShipDto> createShipList = AppConfig.get().isLoadCreateShipLog()
+                    ? CreateReportLogic.loadCreateShipReport()
+                    : null;
             if (createShipList != null) {
-                this.display.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            GlobalContext.addGetshipList(createShipList);
-                            ApplicationMain.logPrint("建造ログ読み込み完了(" + createShipList.size() + "件)");
-                        }
-                        catch (Exception e) {
-                            LOG.get().warn("GUI更新でエラー", e);
-                        }
+                this.display.asyncExec(() -> {
+                    try {
+                        GlobalContext.addGetshipList(createShipList);
+                        ApplicationMain.logPrint("建造ログ読み込み完了(" + createShipList.size() + "件)");
+                    } catch (Exception e) {
+                        LOG.get().warn("GUI更新でエラー", e);
                     }
                 });
             }
@@ -134,19 +126,16 @@ public final class BackgroundInitializer extends Thread {
 
         try {
             // 開発ログ
-            final List<CreateItemDto> createItemList = AppConfig.get().isLoadCreateItemLog() ?
-                    CreateReportLogic.loadCreateItemReport() : null;
+            final List<CreateItemDto> createItemList = AppConfig.get().isLoadCreateItemLog()
+                    ? CreateReportLogic.loadCreateItemReport()
+                    : null;
             if (createItemList != null) {
-                this.display.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            GlobalContext.addCreateItemList(createItemList);
-                            ApplicationMain.logPrint("開発ログ読み込み完了(" + createItemList.size() + "件)");
-                        }
-                        catch (Exception e) {
-                            LOG.get().warn("GUI更新でエラー", e);
-                        }
+                this.display.asyncExec(() -> {
+                    try {
+                        GlobalContext.addCreateItemList(createItemList);
+                        ApplicationMain.logPrint("開発ログ読み込み完了(" + createItemList.size() + "件)");
+                    } catch (Exception e) {
+                        LOG.get().warn("GUI更新でエラー", e);
                     }
                 });
             }
@@ -158,24 +147,30 @@ public final class BackgroundInitializer extends Thread {
             // 出撃ログファイル読み込み
             BattleResultServer.load();
             final int failCount = BattleResultServer.get().getFailCount();
-            this.display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        final int numLogRecord = BattleResultServer.get().size();
-                        ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
-                        if (failCount > 0) {
-                            ApplicationMain.logPrint("注意:" + failCount + "件の出撃ログ読み込みに失敗しています");
-                        }
+            this.display.asyncExec(() -> {
+                try {
+                    final int numLogRecord = BattleResultServer.get().size();
+                    ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
+                    if (failCount > 0) {
+                        ApplicationMain.logPrint("注意:" + failCount + "件の出撃ログ読み込みに失敗しています");
                     }
-                    catch (Exception e) {
-                        LOG.get().warn("GUI更新でエラー", e);
-                    }
+                } catch (Exception e) {
+                    LOG.get().warn("GUI更新でエラー", e);
                 }
             });
         } catch (Exception e) {
             LOG.get().warn("出撃ログの読み込みに失敗しました (" + AppConfig.get().getBattleLogPath() + ")", e);
         }
+
+        // マップセル読み込み
+        this.display.asyncExec(() -> {
+            try {
+                MapEdges.load();
+                ApplicationMain.logPrint("マップセル読み込み完了");
+            } catch (IOException e) {
+                LOG.get().warn("マップセルの読み込みに失敗しました", e);
+            }
+        });
 
         ApplicationMain.logPrint("バックグラウンド初期化完了");
     }

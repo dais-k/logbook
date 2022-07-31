@@ -94,7 +94,7 @@ public class ResourceLog extends AbstractDto {
 
                     int baseIdx;
                     // 拡張版の方は１列追加してしまったので、両方に対応させる！
-                    if (NumberUtils.isNumber(colums[1])) {
+                    if (NumberUtils.isCreatable(colums[1])) {
                         // 本家のログ
                         baseIdx = 1;
                     }
@@ -113,6 +113,7 @@ public class ResourceLog extends AbstractDto {
                     continue;
                 }
             }
+            ite.close();
         }
         // 資材ログが2行以下の場合はグラフを描画出来ないのでnullを返す
         if (logs.size() <= 2) {

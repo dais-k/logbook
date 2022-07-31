@@ -3,9 +3,13 @@
  */
 package logbook.dto;
 
+import java.util.Objects;
+
 import javax.json.JsonObject;
 
+import logbook.config.AppConfig;
 import logbook.internal.EnemyData;
+import logbook.internal.MapEdges;
 import logbook.internal.MasterData;
 
 import com.dyuproject.protostuff.Tag;
@@ -96,21 +100,40 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     private String toString(boolean detailed, boolean withBoss) {
-        String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
-        if (detailed) {
-            MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
-            if (mapInfo != null) {
-                String mapName = mapInfo.getName();
-                ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];
+        String[] mapEdge = MapEdges.get(this.map);
+        if (AppConfig.get().isUseAlphabetizeMap() && Objects.nonNull(mapEdge) && mapEdge.length > 1) {
+            String ret = "マップ:" + this.map[0] + "-" + this.map[1] + "-" + mapEdge[1] + "(" + this.map[2] + ")";
+            if (detailed) {
+                MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
+                if (mapInfo != null) {
+                    String mapName = mapInfo.getName();
+                    ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + "-" + mapEdge[1] + "(" + this.map[2] + "))";
+                }
             }
-        }
-        if (withBoss) {
-            String next = this.getNextKind();
-            if (next != null) {
-                ret += " (" + next + ")";
+            if (withBoss) {
+                String next = this.getNextKind();
+                if (next != null) {
+                    ret += " (" + next + ")";
+                }
             }
+            return ret;
+        } else {
+            String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
+            if (detailed) {
+                MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
+                if (mapInfo != null) {
+                    String mapName = mapInfo.getName();
+                    ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];
+                }
+            }
+            if (withBoss) {
+                String next = this.getNextKind();
+                if (next != null) {
+                    ret += " (" + next + ")";
+                }
+            }
+            return ret;
         }
-        return ret;
     }
 
     @Override

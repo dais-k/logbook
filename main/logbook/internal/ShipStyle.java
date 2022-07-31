@@ -11,9 +11,6 @@ import logbook.internal.MasterData.ShipTypeDto;
  */
 public class ShipStyle {
 
-    /** ロガー */
-    private static final LoggerHolder LOG = new LoggerHolder(ShipStyle.class);
-
     /**
      * 艦種プリセット値
      */

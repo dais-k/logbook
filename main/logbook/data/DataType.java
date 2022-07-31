@@ -157,6 +157,8 @@ public enum DataType {
     CHANGE_NAME("/kcsapi/api_req_air_corps/change_name"),
     /** 友軍艦隊設定 */
     SET_FRIENDLY_REQUEST("/kcsapi/api_req_member/set_friendly_request"),
+    /** 基地航空隊:入替 */
+    CHANGE_DEPLOYMENT_BASE("/kcsapi/api_req_air_corps/change_deployment_base"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

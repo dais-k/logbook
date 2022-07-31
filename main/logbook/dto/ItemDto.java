@@ -50,12 +50,18 @@ public class ItemDto extends AbstractDto {
         this.info = info;
         this.slotitemId = info.getId();
         this.id = object.getInt("api_id");
+
         if (object.containsKey("api_locked")) {
             this.locked = object.getInt("api_locked") != 0;
-            this.level = object.getInt("api_level");
         }
         else {
             this.locked = false;
+        }
+
+        if (object.containsKey("api_level")) {
+            this.level = object.getInt("api_level");
+        }
+        else {
             this.level = 0;
         }
 

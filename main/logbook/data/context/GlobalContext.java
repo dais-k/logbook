@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
@@ -62,6 +63,8 @@ import logbook.dto.QuestDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.dto.SquadronDto;
+import logbook.dto.StartAirbaseDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
@@ -70,6 +73,7 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.CondTiming;
 import logbook.internal.Item;
 import logbook.internal.LoggerHolder;
+import logbook.internal.MapEdges;
 import logbook.internal.MasterData;
 import logbook.internal.ResultRecord;
 import logbook.internal.Ship;
@@ -200,7 +204,9 @@ public final class GlobalContext {
     private static int nextSlotitemId;
 
     /** 基地航空隊 */
-    private static AirbaseDto airbase;
+    private static List<AirbaseDto> airbases = new ArrayList<AirbaseDto>();
+
+    private static StartAirbaseDto startAirbase = new StartAirbaseDto();
 
     /** 海域ゲージ */
     private static List<MapHpInfoDto> mapHpInfo;
@@ -267,10 +273,10 @@ public final class GlobalContext {
     public static int slotItemSize() {
         Integer[] exclusions = { 23, 43, 44 };
         return (int) getItemMap().values()
-            .stream()
-            .map(ItemDto::getType2)
-            .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
-            .count();
+                .stream()
+                .map(ItemDto::getType2)
+                .filter((type2) -> !Arrays.asList(exclusions).contains(type2))
+                .count();
     }
 
     /**
@@ -633,7 +639,7 @@ public final class GlobalContext {
         return resultRecord;
     }
 
-    public static boolean getRequestFriendlyFleetFlag(){
+    public static boolean getRequestFriendlyFleetFlag() {
         return requestFriendlyFleetFlag == 1;
     }
 
@@ -690,7 +696,7 @@ public final class GlobalContext {
             // 友軍艦隊
             case SET_FRIENDLY_REQUEST:
                 doSetFriendlyRequest(data, apidata);
-            // 保有装備
+                // 保有装備
             case SLOTITEM_MEMBER:
                 doSlotitemMember(data, apidata);
                 break;
@@ -897,7 +903,7 @@ public final class GlobalContext {
                 break;
             case SELECT_EVENTMAP_RANK:
                 doSelectEventmapRank(data, apidata);
-            // 遠征情報
+                // 遠征情報
             case MISSION:
                 doMission(data, apidata);
                 break;
@@ -942,7 +948,7 @@ public final class GlobalContext {
                 doBaseAirCorps(data, apidata);
                 // 基地航空隊:中隊設定
             case SET_PLANE:
-                doSetPlane(data, apidata);
+                doSetPlaneAndSupply(data, apidata);
                 break;
             // 基地航空隊:行動指示変更
             case SET_ACTION:
@@ -950,11 +956,15 @@ public final class GlobalContext {
                 break;
             //基地航空隊:補給
             case SUPPLY:
-                doSupply(data, apidata);
+                doSetPlaneAndSupply(data, apidata);
                 break;
             // 基地航空隊:名前変更
             case CHANGE_NAME:
                 doChangeName(data, apidata);
+                break;
+            // 基地航空隊:入替
+            case CHANGE_DEPLOYMENT_BASE:
+                doChangeDeploymentBase(data, apidata);
                 break;
             default:
                 break;
@@ -1075,8 +1085,16 @@ public final class GlobalContext {
      * 基地航空隊を取得
      * @return airbase
      */
-    public static AirbaseDto getAirbase() {
-        return airbase;
+    public static List<AirbaseDto> getAirbases() {
+        return airbases;
+    }
+
+    /**
+     * 基地航空隊攻撃対象時点
+     * @return startAirbase
+     */
+    public static StartAirbaseDto getStartAirbase() {
+        return startAirbase;
     }
 
     /**
@@ -1333,6 +1351,9 @@ public final class GlobalContext {
 
                 updateShipParameter.sortieEnd();
                 state = checkDataState(endSortie);
+
+                // 基地航空隊出撃時点クリア
+                startAirbase.clearStrikePoint();
 
                 addUpdateLog("母港情報を更新しました");
 
@@ -1770,7 +1791,7 @@ public final class GlobalContext {
                 ResourceItemDto res = new ResourceItemDto();
                 res.loadBaseMaterialsFromField(data);
                 JsonArray item_array = apidata.getJsonArray("api_get_items");
-                for (int i=0; i<item_array.size(); i++) {
+                for (int i = 0; i < item_array.size(); i++) {
                     CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
                     ItemDto item = addSlotitem(item_array.getJsonObject(i));
                     if (item != null) {
@@ -2077,7 +2098,9 @@ public final class GlobalContext {
         try {
             // 近代化改修に使った艦を取り除く
             String shipids = data.getField("api_id_items");
-            boolean destroyItem =  (data.getField("api_slot_dest_flag") != null ? (!"0".equals(data.getField("api_slot_dest_flag"))) : true);
+            boolean destroyItem = (data.getField("api_slot_dest_flag") != null
+                    ? (!"0".equals(data.getField("api_slot_dest_flag")))
+                    : true);
             for (String shipid : shipids.split(",")) {
                 ShipDto ship = shipMap.get(Integer.valueOf(shipid));
                 if (ship != null) {
@@ -2085,8 +2108,7 @@ public final class GlobalContext {
                     CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "近代化改修"));
                     // 装備解除後の近代化改修ではなく通常の近代化改修の場合、
                     // 持っている装備を廃棄する
-                    if (destroyItem)
-                    {
+                    if (destroyItem) {
                         for (int item : ship.getItemId()) {
                             itemMap.remove(item);
                         }
@@ -2175,8 +2197,8 @@ public final class GlobalContext {
                 JsonObject apiship = apidata.getJsonObject("api_ship_data");
 
                 JsonObject[] apiShip = {
-                    apiship.getJsonObject("api_set_ship"),
-                    apiship.getJsonObject("api_unset_ship")
+                        apiship.getJsonObject("api_set_ship"),
+                        apiship.getJsonObject("api_unset_ship")
                 };
 
                 for (int i = 0; i < apiShip.length; i++) {
@@ -2560,8 +2582,7 @@ public final class GlobalContext {
                             // 任務を作成
                             disp_page = (index + items_per_page) / items_per_page;
                             QuestDto quest = new QuestDto(questobject, disp_page, pos++);
-                            if (pos > items_per_page)
-                            {
+                            if (pos > items_per_page) {
                                 pos = 1;
                             }
                             questList.set(index, quest);
@@ -2692,10 +2713,24 @@ public final class GlobalContext {
      */
     private static void doStartAirBase(Data data, JsonValue json) {
         try {
-            for (int i = 1; i <= 4; ++i) {
+            for (int i = 1; i <= 3; ++i) {
                 String strikePoint = data.getField("api_strike_point_" + i);
                 if (strikePoint != null) {
-                    addConsole("基地航空隊 " + i + " -> " + strikePoint);
+                    int[] strikePoints = Stream.of(strikePoint.split(",")).mapToInt(Integer::parseInt).toArray();
+                    startAirbase.setStrikePoint(i, strikePoints);
+                    int[] map = mapCellDto.getMap();
+                    if (AppConfig.get().isUseAlphabetizeMap() && Objects.nonNull(map)) {
+                        String s = Arrays.stream(strikePoint.split(",")).map((point) -> {
+                            String[] mapEdge = MapEdges.get(new int[]{map[0], map[1], Integer.parseInt(point)});
+                            if (Objects.nonNull(mapEdge) && mapEdge.length > 1) {
+                                return mapEdge[1] + "(" + point + ")";
+                            }
+                            return point;
+                        }).collect(Collectors.joining(","));
+                        addConsole("基地航空隊 " + i + " -> " + s);
+                    } else {
+                        addConsole("基地航空隊 " + i + " -> " + strikePoint);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -2770,14 +2805,20 @@ public final class GlobalContext {
                         if (api.containsKey("api_defeat_count") && api.containsKey("api_required_defeat_count")) {
                             int defeatCount = api.getInt("api_defeat_count");
                             int requiredDefeatCount = api.getInt("api_required_defeat_count");
-                            return new MapHpInfoDto(mapId, 0, cleared, defeatCount, requiredDefeatCount, -1, -1, gaugeIndex, gaugeType);
+                            return new MapHpInfoDto(mapId, 0, cleared, defeatCount, requiredDefeatCount, -1, -1,
+                                    gaugeIndex, gaugeType);
                         }
                         if (api.containsKey("api_eventmap")) {
                             JsonObject eventMap = api.getJsonObject("api_eventmap");
-                            int nowMapHp = eventMap.containsKey("api_now_maphp") ? eventMap.getInt("api_now_maphp") : -1;
-                            int maxMapHp = eventMap.containsKey("api_max_maphp") ? eventMap.getInt("api_max_maphp") : -1;
-                            int difficulty = eventMap.containsKey("api_selected_rank") ? eventMap.getInt("api_selected_rank") : -1;
-                            return new MapHpInfoDto(mapId, difficulty, cleared, -1, -1, nowMapHp, maxMapHp, gaugeIndex, gaugeType);
+                            int nowMapHp = eventMap.containsKey("api_now_maphp") ? eventMap.getInt("api_now_maphp")
+                                    : -1;
+                            int maxMapHp = eventMap.containsKey("api_max_maphp") ? eventMap.getInt("api_max_maphp")
+                                    : -1;
+                            int difficulty = eventMap.containsKey("api_selected_rank")
+                                    ? eventMap.getInt("api_selected_rank")
+                                    : -1;
+                            return new MapHpInfoDto(mapId, difficulty, cleared, -1, -1, nowMapHp, maxMapHp, gaugeIndex,
+                                    gaugeType);
                         }
                         return new MapHpInfoDto(mapId, 0, cleared, -1, -1, -1, -1, gaugeIndex, gaugeType);
                     }).collect(Collectors.toList());
@@ -2786,7 +2827,10 @@ public final class GlobalContext {
                 JsonValue api_air_base = ((JsonObject) json).get("api_air_base");
                 if (api_air_base instanceof JsonArray) {
                     JsonArray apidata = (JsonArray) api_air_base;
-                    airbase = new AirbaseDto(apidata);
+                    airbases = apidata.stream()
+                            .map(JsonObject.class::cast)
+                            .map(api -> new AirbaseDto(api, getItemMap()))
+                            .collect(Collectors.toList());
                     ApplicationMain.main.updateAirbase();
                 }
             }
@@ -2803,7 +2847,8 @@ public final class GlobalContext {
      */
     private static void doSelectEventmapRank(Data data, JsonValue json) {
         try {
-            int mapId = Integer.parseInt(data.getField("api_maparea_id")) * 10 + Integer.parseInt(data.getField("api_map_no"));
+            int mapId = Integer.parseInt(data.getField("api_maparea_id")) * 10
+                    + Integer.parseInt(data.getField("api_map_no"));
             int difficulty = Integer.parseInt(data.getField("api_rank"));
             JsonObject api = ((JsonObject) json);
             int nowMapHp = api.containsKey("api_now_maphp") ? api.getInt("api_now_maphp") : -1;
@@ -2814,7 +2859,8 @@ public final class GlobalContext {
             while (iterator.hasNext()) {
                 MapHpInfoDto _mapHpInfo = (MapHpInfoDto) iterator.next();
                 if (_mapHpInfo.getMapId() == mapId) {
-                    iterator.set(new MapHpInfoDto(mapId, difficulty, 0, -1, -1, nowMapHp, maxMapHp, gaugeIndex, gaugeType));
+                    iterator.set(
+                            new MapHpInfoDto(mapId, difficulty, 0, -1, -1, nowMapHp, maxMapHp, gaugeIndex, gaugeType));
                     break;
                 }
             }
@@ -2959,21 +3005,33 @@ public final class GlobalContext {
         // 処理ちゃんと分かってないので保留
     }
 
-    private static void doSetPlane(Data data, JsonValue json) {
+    private static void doSetPlaneAndSupply(Data data, JsonValue json) {
         try {
             if (json instanceof JsonObject) {
                 JsonObject apidata = (JsonObject) json;
-                if (Objects.nonNull(airbase)) {
-                    int area = Integer.parseInt(data.getField("api_area_id"));
-                    int base = Integer.parseInt(data.getField("api_base_id"));
-                    if (airbase.get().containsKey(area)) {
-                        if (airbase.get().get(area).containsKey(base)) {
-                            airbase.get().get(area).get(base).setPlane(apidata);
-                            ApplicationMain.main.updateAirbase();
+                int areaId = Integer.parseInt(data.getField("api_area_id"));
+                int baseId = Integer.parseInt(data.getField("api_base_id"));
+                for (AirbaseDto airbase : airbases) {
+                    if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                        List<SquadronDto> newPlaneInfos = apidata.getJsonArray("api_plane_info").stream()
+                                .map(JsonObject.class::cast)
+                                .map(planeInfo -> new SquadronDto(itemMap.get(planeInfo.getInt("api_slotid")),
+                                        planeInfo))
+                                .collect(Collectors.toList());
+                        for (SquadronDto newPlaneInfo : newPlaneInfos) {
+                            for (int i = 0; i < airbase.getPlaneInfos().size(); i++) {
+                                SquadronDto planeInfo = airbase.getPlaneInfos().get(i);
+                                if (newPlaneInfo.getSquadronId() == planeInfo.getSquadronId()) {
+                                    airbase.getPlaneInfos().set(i, newPlaneInfo);
+                                    break;
+                                }
+                            }
                         }
+                        break;
                     }
                 }
             }
+            ApplicationMain.main.updateAirbase();
             addUpdateLog("基地航空隊情報を更新しました");
         } catch (Exception e) {
             LOG.get().warn("基地航空隊更新に失敗しました", e);
@@ -2983,45 +3041,21 @@ public final class GlobalContext {
 
     private static void doSetAction(Data data, JsonValue json) {
         try {
-            if (Objects.nonNull(airbase)) {
-                int area = Integer.parseInt(data.getField("api_area_id"));
-                int[] bases = Arrays.stream(data.getField("api_base_id").split(",")).mapToInt(Integer::parseInt)
-                        .toArray();
-                int[] actionKinds = Arrays.stream(data.getField("api_action_kind").split(","))
-                        .mapToInt(Integer::parseInt).toArray();
-                if (airbase.get().containsKey(area)) {
-                    for (int i = 0; i < bases.length; i++) {
-                        int base = bases[i];
-                        int actionKind = actionKinds[i];
-                        if (airbase.get().get(area).containsKey(base)) {
-                            airbase.get().get(area).get(base).setActionKind(actionKind);
-                            ApplicationMain.main.updateAirbase();
-                        }
-                    }
-                }
-            }
-            addUpdateLog("基地航空隊情報を更新しました");
-        } catch (Exception e) {
-            LOG.get().warn("基地航空隊更新に失敗しました", e);
-            LOG.get().warn(data);
-        }
-    }
+            int areaId = Integer.parseInt(data.getField("api_area_id"));
+            int[] baseIds = Arrays.stream(data.getField("api_base_id").split(","))
+                    .mapToInt(Integer::parseInt).toArray();
+            int[] actionKinds = Arrays.stream(data.getField("api_action_kind").split(","))
+                    .mapToInt(Integer::parseInt).toArray();
 
-    private static void doSupply(Data data, JsonValue json) {
-        try {
-            if (json instanceof JsonObject) {
-                JsonObject apidata = (JsonObject) json;
-                if (Objects.nonNull(airbase)) {
-                    int area = Integer.parseInt(data.getField("api_area_id"));
-                    int base = Integer.parseInt(data.getField("api_base_id"));
-                    if (airbase.get().containsKey(area)) {
-                        if (airbase.get().get(area).containsKey(base)) {
-                            airbase.get().get(area).get(base).supply(apidata);
-                            ApplicationMain.main.updateAirbase();
-                        }
+            for (int i = 0; i < baseIds.length; i++) {
+                for (AirbaseDto airbase : airbases) {
+                    if (airbase.getAreaId() == areaId && airbase.getRid() == baseIds[i]) {
+                        airbase.setActionKind(actionKinds[i]);
+                        break;
                     }
                 }
             }
+            ApplicationMain.main.updateAirbase();
             addUpdateLog("基地航空隊情報を更新しました");
         } catch (Exception e) {
             LOG.get().warn("基地航空隊更新に失敗しました", e);
@@ -3031,17 +3065,57 @@ public final class GlobalContext {
 
     private static void doChangeName(Data data, JsonValue json) {
         try {
-            if (Objects.nonNull(airbase)) {
-                int area = Integer.parseInt(data.getField("api_area_id"));
-                int base = Integer.parseInt(data.getField("api_base_id"));
-                String name = data.getField("api_name");
-                if (airbase.get().containsKey(area)) {
-                    if (airbase.get().get(area).containsKey(base)) {
-                        airbase.get().get(area).get(base).setName(name);
-                        ApplicationMain.main.updateAirbase();
+            int areaId = Integer.parseInt(data.getField("api_area_id"));
+            int baseId = Integer.parseInt(data.getField("api_base_id"));
+            String name = data.getField("api_name");
+            for (AirbaseDto airbase : airbases) {
+                if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                    airbase.setName(name);
+                    break;
+                }
+            }
+            ApplicationMain.main.updateAirbase();
+            addUpdateLog("基地航空隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static void doChangeDeploymentBase(Data data, JsonValue json) {
+        try {
+            if (json instanceof JsonObject) {
+                JsonObject apidata = (JsonObject) json;
+                int areaId = Integer.parseInt(data.getField("api_area_id"));
+                JsonObject[] bases = apidata.getJsonArray("api_base_items").stream()
+                        .map(JsonObject.class::cast)
+                        .toArray(JsonObject[]::new);
+                for (JsonObject base : bases) {
+                    int baseId = base.getInt("api_rid");
+                    for (AirbaseDto airbase : airbases) {
+                        if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                            airbase.setDistanceBase(base.getJsonObject("api_distance").getInt("api_base"));
+                            airbase.setDistanceBonus(base.getJsonObject("api_distance").getInt("api_bonus"));
+                            List<SquadronDto> newPlaneInfos = base.getJsonArray("api_plane_info").stream()
+                                    .map(JsonObject.class::cast)
+                                    .map(planeInfo -> new SquadronDto(itemMap.get(planeInfo.getInt("api_slotid")),
+                                            planeInfo))
+                                    .collect(Collectors.toList());
+                            for (SquadronDto newPlaneInfo : newPlaneInfos) {
+                                for (int i = 0; i < airbase.getPlaneInfos().size(); i++) {
+                                    SquadronDto planeInfo = airbase.getPlaneInfos().get(i);
+                                    if (newPlaneInfo.getSquadronId() == planeInfo.getSquadronId()) {
+                                        airbase.getPlaneInfos().set(i, newPlaneInfo);
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
             }
+            ApplicationMain.main.updateAirbase();
             addUpdateLog("基地航空隊情報を更新しました");
         } catch (Exception e) {
             LOG.get().warn("基地航空隊更新に失敗しました", e);

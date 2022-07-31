@@ -1,6 +1,5 @@
 package logbook.gui.listener;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -9,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import logbook.config.AppConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
-import logbook.dto.ItemDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
