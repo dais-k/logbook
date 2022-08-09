@@ -475,7 +475,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 String onSlot = "";
                 String itemName = "";
                 String tooltip = "";
-                if (Objects.nonNull(sq)) {
+                if (sq.isNotEmptySlot()) {
                     onSlot += sq.getCount() + "/" + sq.getMaxCount();
                     itemName += sq.getFriendlyName();
                     tooltip += getItemParamTooltipContents(sq);

@@ -90,4 +90,8 @@ public class SquadronDto extends ItemDto {
     public void setCond(int cond) {
         this.cond = cond;
     }
+
+    public boolean isNotEmptySlot() {
+        return super.getSlotitemId() > 0;
+    }
 }
