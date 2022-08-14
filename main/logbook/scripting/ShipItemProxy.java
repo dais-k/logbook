@@ -52,6 +52,7 @@ public class ShipItemProxy implements ShipItemListener {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(ShipDto ship) {
         this.bodyMethod.ship = ship;
         return this.script.body(this.bodyMethod);

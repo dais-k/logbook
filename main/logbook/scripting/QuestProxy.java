@@ -51,6 +51,7 @@ public class QuestProxy implements QuestListener {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(QuestDto data) {
         this.bodyMethod.data = data;
         return this.script.body(this.bodyMethod);

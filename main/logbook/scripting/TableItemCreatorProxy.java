@@ -22,6 +22,7 @@ public class TableItemCreatorProxy implements TableItemCreator {
 
     private class CreateMethod implements MethodInvoke {
         public Table table;
+        @SuppressWarnings("rawtypes")
         public Comparable[] data;
         public int index;
 
@@ -42,6 +43,7 @@ public class TableItemCreatorProxy implements TableItemCreator {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public TableItem create(Table table, Comparable[] data, int index) {
         this.createMethod.table = table;
         this.createMethod.data = data;
@@ -54,6 +56,7 @@ public class TableItemCreatorProxy implements TableItemCreator {
         return item;
     }
 
+    @SuppressWarnings("rawtypes")
     private TableItem defautlCreate(Table table, Comparable[] data, int index) {
         TableItem item = new TableItem(table, SWT.NONE);
         // 偶数行に背景色を付ける

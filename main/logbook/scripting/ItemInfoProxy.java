@@ -51,6 +51,7 @@ public class ItemInfoProxy implements ItemInfoListener {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(ItemInfo data) {
         this.bodyMethod.data = data;
         return this.script.body(this.bodyMethod);

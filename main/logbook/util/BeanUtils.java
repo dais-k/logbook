@@ -76,6 +76,7 @@ public final class BeanUtils {
      * @return オブジェクト
      */
     @CheckForNull
+    @SuppressWarnings("unchecked")
     public static <T> T readObject(File file, Class<T> clazz) {
         File target = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".zip");
 

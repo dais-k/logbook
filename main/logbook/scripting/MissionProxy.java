@@ -51,6 +51,7 @@ public class MissionProxy implements MissionListener {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(MissionDto data) {
         this.bodyMethod.data = data;
         return this.script.body(this.bodyMethod);

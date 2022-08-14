@@ -23,6 +23,7 @@ public interface ShipItemListener extends TableScriptListener {
      * @param ship　艦娘データ
      * @return　表示内容
      */
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(ShipDto ship);
 
     /**

@@ -67,6 +67,7 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
     protected String[] headerId;
 
     /** テーブルに表示しているボディー */
+    @SuppressWarnings("rawtypes")
     protected List<Comparable[]> body;
 
     /** ソート順序 */
@@ -423,6 +424,7 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
     /**
      * テーブルボディーをセットする
      */
+    @SuppressWarnings("rawtypes")
     protected void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
         creator.begin(this.getTableHeader());
@@ -925,6 +927,7 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
     /**
      * テーブルをソートする{@link java.util.Comparator}です。
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected class TableComparator implements Comparator<Comparable[]> {
 
         /** ソート設定済みフラグ */
@@ -979,22 +982,22 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             return this.confflg;
         }
 
-        /**
-         * 比較する
-         *
-         * @param o1
-         * @param o2
-         * @param order
-         * @return
-         */
-        private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
-            if (this.order) {
-                return o1.compareTo(o2);
-            }
-            else {
-                return o2.compareTo(o1);
-            }
-        }
+        // /**
+        //  * 比較する
+        //  *
+        //  * @param o1
+        //  * @param o2
+        //  * @param order
+        //  * @return
+        //  */
+        // private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
+        //     if (this.order) {
+        //         return o1.compareTo(o2);
+        //     }
+        //     else {
+        //         return o2.compareTo(o1);
+        //     }
+        // }
     }
 
     /**

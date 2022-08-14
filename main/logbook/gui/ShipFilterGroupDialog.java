@@ -316,6 +316,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     protected void updateTableBody() {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         CondTiming condTiming = GlobalContext.getCondTiming();

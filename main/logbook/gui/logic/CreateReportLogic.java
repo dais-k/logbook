@@ -80,9 +80,10 @@ public final class CreateReportLogic {
      * @param filter フィルタ
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getBattleResultBody(BattleResultFilter filter) {
         List<BattleResultDto> results = BattleResultServer.get().getFilteredList(filter);
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
 
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
@@ -129,8 +130,9 @@ public final class CreateReportLogic {
      *
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getBattleResultStoreBody(List<BattleExDto> results) {
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
 
         // SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
 
@@ -201,8 +203,9 @@ public final class CreateReportLogic {
      * @param ships 建造された艦データ
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getCreateShipBody(List<GetShipDto> ships) {
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
             body.add(new Comparable[] { new TableRowHeader(i + 1, ship),
@@ -253,8 +256,9 @@ public final class CreateReportLogic {
      * @param items 開発された装備データ
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getCreateItemBody(List<CreateItemDto> items) {
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
 
         for (int i = 0; i < items.size(); i++) {
             CreateItemDto item = items.get(i);
@@ -314,6 +318,7 @@ public final class CreateReportLogic {
      *
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getItemListBody() {
         // ItemInfoを作成してスクリプトに渡す
         Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
@@ -346,7 +351,7 @@ public final class CreateReportLogic {
             }
         });
 
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
         ItemInfoListener script = ItemInfoProxy.get();
         script.begin();
         for (ItemInfo itemInfo : countitems) {
@@ -376,10 +381,11 @@ public final class CreateReportLogic {
      * @param filter 鍵付きのみ
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getShipListBody(int specdisp, ShipFilterDto filter) {
         //ApplicationMain.sysPrint("ShipListBody Start");
         Set<Integer> missionSet = GlobalContext.getMissionShipSet();
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
         ShipItemListener script = ShipItemProxy.get();
         script.begin(specdisp == 0, filter, specdisp);
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
@@ -408,8 +414,9 @@ public final class CreateReportLogic {
      * @param resultlist 遠征結果データ
      * @return 遠征結果
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getMissionResultBody(List<MissionResultDto> resultlist) {
-        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        List<Comparable[]> body = new ArrayList<>();
 
         for (int i = 0; i < resultlist.size(); i++) {
             MissionResultDto result = resultlist.get(i);
@@ -496,6 +503,7 @@ public final class CreateReportLogic {
     /**
      * @return 任務一覧の内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getQuestBody() {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
@@ -528,6 +536,7 @@ public final class CreateReportLogic {
      * @param materials 資材
      * @return 資材の内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getMaterialStoreBody(MaterialDto material, BasicInfoDto basic) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
@@ -563,6 +572,7 @@ public final class CreateReportLogic {
      * @param lostList ロストデータ
      * @return ロストログの内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getLostStoreBody(List<LostEntityDto> lostList) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
@@ -597,6 +607,7 @@ public final class CreateReportLogic {
      * @param fleetid 遠征艦隊（2～4）
      * @return 内容
      */
+    @SuppressWarnings("rawtypes")
     public static List<Comparable[]> getMissionBody(int fleetid) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         MissionProxy script = MissionProxy.get();
@@ -620,6 +631,7 @@ public final class CreateReportLogic {
      * @param applend 追記フラグ
      * @throws IOException 書き込みに失敗した
      */
+    @SuppressWarnings("rawtypes")
     public static void writeCsvStripFirstColumn(File file, String[] header, List<Comparable[]> body, boolean applend)
             throws IOException {
         // 報告書の項番を除く
@@ -640,6 +652,7 @@ public final class CreateReportLogic {
      * @param applend 追記フラグ
      * @throws IOException 書き込みに失敗した
      */
+    @SuppressWarnings("rawtypes")
     public static void writeCsv(File file, String[] header, List<Comparable[]> body, boolean applend, Charset charset)
             throws IOException {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));

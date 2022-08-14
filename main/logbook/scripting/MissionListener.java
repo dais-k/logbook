@@ -21,6 +21,7 @@ public interface MissionListener extends TableScriptListener {
      * @param data　遠征データ
      * @return　表示内容
      */
+    @SuppressWarnings("rawtypes")
     Comparable[] body(MissionDto data);
 
     /**

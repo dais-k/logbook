@@ -20,6 +20,7 @@ public interface TableItemCreator {
      * @param index 行番号（上から0始まり）
      * @return 作成したTableItem
      */
+    @SuppressWarnings("rawtypes")
     TableItem create(Table table, Comparable[] data, int index);
 
     /**

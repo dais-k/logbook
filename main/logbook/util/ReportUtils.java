@@ -61,6 +61,7 @@ public class ReportUtils {
      * @param data テーブルに表示する内容
      * @return テーブルに表示する内容
      */
+    @SuppressWarnings("rawtypes")
     public static String[] toStringArray(Comparable[] data) {
         String[] ret = new String[data.length];
         for (int i = 0; i < data.length; ++i) {

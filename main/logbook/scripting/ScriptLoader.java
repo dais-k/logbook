@@ -246,6 +246,7 @@ public class ScriptLoader {
         };
 
         private final String[] header;
+        @SuppressWarnings("rawtypes")
         private final Comparable[] exceptionBody;
 
         public TableScript(File scriptFile, Class<?> type) {
@@ -266,6 +267,7 @@ public class ScriptLoader {
             return this.header;
         }
 
+        @SuppressWarnings("rawtypes")
         public Comparable[] body(MethodInvoke invokable) {
             if (this.header == null) {
                 return null;
@@ -281,6 +283,7 @@ public class ScriptLoader {
             return this.resize(raw);
         }
 
+        @SuppressWarnings("rawtypes")
         private Comparable[] resize(Comparable[] raw) {
             Comparable[] ret = new Comparable[this.header.length];
             if (raw == null) {
@@ -348,6 +351,7 @@ public class ScriptLoader {
             return result;
         }
 
+        @SuppressWarnings("rawtypes")
         public Comparable[] body(MethodInvoke invokable) {
             Comparable[] result = null;
             for (Script script : this.get()) {

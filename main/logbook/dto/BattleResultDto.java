@@ -45,8 +45,10 @@ public class BattleResultDto extends AbstractDto {
     private final boolean noSpaceForShip;
 
     /** スクリプトサポート */
+    @SuppressWarnings("rawtypes")
     private final Comparable[] extData;
 
+    @SuppressWarnings("rawtypes")
     public BattleResultDto(BattleExDto dto, Comparable[] extData) {
         this.battleDate = dto.getBattleDate();
         this.questName = dto.getQuestName();
@@ -201,6 +203,7 @@ public class BattleResultDto extends AbstractDto {
     /**
      * @return extData
      */
+    @SuppressWarnings("rawtypes")
     public Comparable[] getExtData() {
         return this.extData;
     }

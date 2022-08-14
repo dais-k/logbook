@@ -50,6 +50,7 @@ public final class TableToCsvSaveAdapter extends SelectionAdapter {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public void widgetSelected(SelectionEvent arg) {
         FileDialog dialog = new FileDialog(this.shell, SWT.SAVE);
         dialog.setFileName(this.name + ".csv");
@@ -66,7 +67,7 @@ public final class TableToCsvSaveAdapter extends SelectionAdapter {
                 }
             }
             try {
-                List<Comparable[]> body = new ArrayList<Comparable[]>();
+                List<Comparable[]> body = new ArrayList<>();
                 TableItem[] items = this.table.getItems();
                 for (TableItem item : items) {
                     String[] colums = new String[this.header.length];

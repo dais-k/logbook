@@ -55,6 +55,7 @@ public class BattleLogProxy implements BattleLogListener {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(BattleExDto battle) {
         this.bodyMethod.battle = battle;
         return this.script.body(this.bodyMethod);

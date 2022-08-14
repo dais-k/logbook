@@ -20,6 +20,7 @@ public interface BattleLogListener extends TableScriptListener {
      * @param battle　読み込んだ戦闘結果詳細データ
      * @return　表示内容
      */
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(BattleExDto battle);
 
     /**

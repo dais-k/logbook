@@ -52,6 +52,7 @@ public class BattleResultServer {
         public DataFile file;
         public int index;
 
+        @SuppressWarnings("rawtypes")
         BattleResult(BattleExDto dto, DataFile file, int index, Comparable[] extData) {
             super(dto, extData);
             this.file = file;

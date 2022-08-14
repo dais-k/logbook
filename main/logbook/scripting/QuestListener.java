@@ -21,6 +21,7 @@ public interface QuestListener extends TableScriptListener {
      * @param data　任務データ
      * @return　表示内容
      */
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(QuestDto quest);
 
     /**

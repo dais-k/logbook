@@ -20,6 +20,7 @@ public interface ItemInfoListener extends TableScriptListener {
      * @param data　装備データ
      * @return　表示内容
      */
+    @SuppressWarnings("rawtypes")
     public Comparable[] body(ItemInfo item);
 
     /**
