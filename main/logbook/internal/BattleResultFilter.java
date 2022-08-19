@@ -22,5 +22,6 @@ public class BattleResultFilter {
     public String rankCombo = null;
     public Boolean printPractice = null;
     public Boolean printBoss = null;
+    public String mass = null;
 
 }

@@ -295,7 +295,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button alphabetize = new Button(compositeSystem, SWT.CHECK);
         alphabetize.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        alphabetize.setText("マップをアルファベット表示にする(Thanks for KC3改)");
+        alphabetize.setText("マスの指定にアルファベットを使用(Thanks for KC3改)");
         alphabetize.setSelection(AppConfig.get().isUseAlphabetizeMap());
 
         final Combo systemWideShortcutKey;

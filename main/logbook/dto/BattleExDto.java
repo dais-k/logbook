@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -219,6 +220,9 @@ public class BattleExDto extends AbstractDto {
 
     @Tag(132)
     private StartAirbaseDto startAirbase;
+
+    @Tag(133)
+    private LinkedList<Integer> passedEdges = new LinkedList<>();
 
     static {
         // 敵艦IDが+1000された日時
@@ -1802,9 +1806,10 @@ public class BattleExDto extends AbstractDto {
      * @param object 受け取ったJSON
      * @param mapInfo マス情報
      */
-    public void setResult(JsonObject object, MapCellDto mapInfo) {
+    public void setResult(JsonObject object, MapCellDto mapInfo, LinkedList<Integer> passedEdges) {
         this.resultJson = object.toString();
         this.mapCellDto = mapInfo;
+        this.passedEdges = passedEdges;
         this.readResultJson(object);
     }
 
@@ -2411,5 +2416,9 @@ public class BattleExDto extends AbstractDto {
 
     public StartAirbaseDto getStartAirbase() {
         return this.startAirbase;
+    }
+
+    public LinkedList<Integer> getPassedEdges() {
+        return this.passedEdges;
     }
 }

@@ -13,6 +13,7 @@ import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.LoggerHolder;
+import logbook.internal.MapEdges;
 import logbook.internal.TimeSpanKind;
 import logbook.util.ReportUtils;
 
@@ -72,6 +73,9 @@ public class BattleFilterDialog extends WindowBase {
 
     private List<Boolean> locationList;
     private CheckAndCombo locationCombo;
+
+    public List<String> massList;
+    private CheckAndCombo massCombo;
 
     public BattleFilterDialog(DropReportTable parent) {
         super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
@@ -194,16 +198,25 @@ public class BattleFilterDialog extends WindowBase {
 
         // 場所
         this.locationList = new ArrayList<>();
-        this.locationCombo = new CheckAndCombo(shell,"場所",1);
+        this.locationCombo = new CheckAndCombo(shell, "場所", 1);
         this.locationCombo.combo.add("ボス");
         this.locationList.add(true);
         this.locationCombo.combo.add("道中");
         this.locationList.add(false);
         this.locationCombo.initState(listener);
 
+        // マス
+        this.massList = new ArrayList<>();
+        this.massCombo = new CheckAndCombo(shell, "マス(A)", 1);
+        this.massCombo.initState(listener);
+        for (String edge : MapEdges.list()) {
+            this.massCombo.combo.add(edge);
+            this.massList.add(edge);
+        }
+
         // SPACE
-        new Label(shell,SWT.NONE);
-        new Label(shell,SWT.NONE);
+        new Label(shell, SWT.NONE);
+        new Label(shell, SWT.NONE);
 
         // 時刻
         Label startLabel = new Label(shell, SWT.NONE);
@@ -228,11 +241,10 @@ public class BattleFilterDialog extends WindowBase {
                 }
             }
 
-            int kindIdx =
-                    (filter.printPractice == null) ? -1 :
-                            filter.printPractice ? 1 : 0;
+            int kindIdx = (filter.printPractice == null) ? -1 : filter.printPractice ? 1 : 0;
             int timeSpanIdx = (filter.timeSpan == null) ? -1 : this.timeList.indexOf(filter.timeSpan);
             int locationIdx = Optional.ofNullable(filter.printBoss).map(BooleanUtils::toInteger).orElse(-1);
+            int massIdx = (filter.mass == null) ? -1 : this.massList.indexOf(filter.mass);
 
             if (mapIdx != -1) {
                 this.mapCombo.select(mapIdx);
@@ -262,6 +274,9 @@ public class BattleFilterDialog extends WindowBase {
             if (locationIdx != -1) {
                 this.locationCombo.select(locationIdx);
             }
+            if (filter.mass != null) {
+                this.massCombo.select(massIdx);
+            }
         }
 
         this.updateCalenderVisible();
@@ -272,8 +287,7 @@ public class BattleFilterDialog extends WindowBase {
         final Runnable datalistener = new GuiUpdator(() -> {
             try {
                 BattleFilterDialog.this.updateContents();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOG.get().warn("フィルタの更新に失敗", e);
             }
         });
@@ -319,7 +333,8 @@ public class BattleFilterDialog extends WindowBase {
         }
         filter.printPractice = (Boolean) getSelectedItem(this.kindCombo, this.kindList);
         TimeSpanKind timeSpan = (TimeSpanKind) getSelectedItem(this.timeCombo, this.timeList);
-        filter.printBoss = (Boolean) getSelectedItem(this.locationCombo,this.locationList);
+        filter.printBoss = (Boolean) getSelectedItem(this.locationCombo, this.locationList);
+        filter.mass = (String) getSelectedItem(this.massCombo, this.massList);
         if (timeSpan == TimeSpanKind.MANUAL) {
             filter.timeSpan = null;
             filter.fromTime = this.fromDate.getSelectedDate(false);

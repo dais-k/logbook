@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -45,5 +46,16 @@ public class MapEdges {
             return edges.get(areaId).get(cell);
         }
         return null;
+    }
+
+    public static String[] list() {
+        return edges.values().stream()
+            .flatMap(edge -> edge.values().stream())
+            .map(masses -> masses[1])
+            .filter(mass -> !mass.matches("^[0-9]*$|^Start.*"))
+            .collect(Collectors.toSet())
+            .stream()
+            .sorted()
+            .toArray(String[]::new);
     }
 }

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -204,7 +205,7 @@ public final class GlobalContext {
     private static int nextSlotitemId;
 
     /** 基地航空隊 */
-    private static List<AirbaseDto> airbases = new ArrayList<AirbaseDto>();
+    private static List<AirbaseDto> airbases = new ArrayList<>();
 
     private static StartAirbaseDto startAirbase = new StartAirbaseDto();
 
@@ -221,6 +222,9 @@ public final class GlobalContext {
     private static UpdateShipParameter updateShipParameter = new UpdateShipParameter();
 
     private static List<EventListener> eventListeners = new ArrayList<>();
+
+    /** 通ったマス */
+    private static LinkedList<Integer> passedEdges = new LinkedList<>();
 
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
@@ -1355,6 +1359,9 @@ public final class GlobalContext {
                 // 基地航空隊出撃時点クリア
                 startAirbase.clearStrikePoint();
 
+                // 通ったマスクリア
+                passedEdges.clear();
+
                 addUpdateLog("母港情報を更新しました");
 
                 // ギミック解除：敵勢力弱体化検知
@@ -1492,7 +1499,7 @@ public final class GlobalContext {
             if (json instanceof JsonObject) {
                 JsonObject apidata = (JsonObject) json;
                 if (battle != null) {
-                    battle.setResult(apidata, mapCellDto);
+                    battle.setResult(apidata, mapCellDto, passedEdges);
 
                     if (battle.isCompleteResult()) { // 情報が不足している場合は記録しない
                         BattleResultServer.get().addNewResult(battle);
@@ -2667,6 +2674,8 @@ public final class GlobalContext {
             if (json instanceof JsonObject) {
                 JsonObject apidata = (JsonObject) json;
                 mapCellDto = new MapCellDto(apidata, isStart);
+                // Start
+                passedEdges.add(mapCellDto.getMap()[2]);
             }
             updateDetailedMaterial("出撃", null, MATERIAL_DIFF.NONE);
 
@@ -2693,6 +2702,7 @@ public final class GlobalContext {
                 JsonObject apidata = (JsonObject) json;
 
                 mapCellDto = new MapCellDto(apidata, isStart);
+                passedEdges.add(mapCellDto.getMap()[2]);
 
                 battle = null;
 

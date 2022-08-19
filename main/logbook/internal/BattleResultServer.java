@@ -464,6 +464,13 @@ public class BattleResultServer {
                 return false;
             }
         }
+        if (Objects.nonNull(filter.mass)){
+            int[] battleMap = dto.getMapCell().getMap();
+            String[] edges = MapEdges.get(battleMap);
+            if (Objects.isNull(edges) || !edges[1].equals(filter.mass)) {
+                return false;
+            }
+        }
         return true;
     }
 

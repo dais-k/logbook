@@ -165,7 +165,7 @@ public class BattleRankChecker {
                         battle.addPhase(data, kind, true);
                     }
                     else if (battle != null) {
-                        battle.setResult(data, null);
+                        battle.setResult(data, null, null);
                         // ランクが合っているかチェック
                         ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
                         if (!battle.getRank().rank().equals(estimatedRank.rank())) {

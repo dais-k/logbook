@@ -1425,6 +1425,34 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             header = result.getMapCell().detailedString() + " (" + time + ")";
         }
         this.inline("div", "<h1>" + header + "</h1>", new String[] { "title" });
+        
+        if (!battle.isPractice()) {
+            MapCellDto mapCellDto = result.getMapCell();
+            if (Objects.nonNull(mapCellDto) && Objects.nonNull(mapCellDto.getMap())) {
+                LinkedList<Integer> passedEdges = battle.getPassedEdges();
+                int[] map = mapCellDto.getMap();
+                if (Objects.nonNull(passedEdges) && passedEdges.size() > 0) {
+                    String edgesHeader = "";
+                    if (AppConfig.get().isUseAlphabetizeMap()) {
+                        String[] start = MapEdges.get(new int[]{ map[0], map[1], passedEdges.get(0) });
+                        if (Objects.nonNull(start)) {
+                            edgesHeader += start[0] + "→";
+                        }
+                        edgesHeader += passedEdges.stream().map(edge -> {
+                            String[] masses = MapEdges.get(new int[]{ map[0], map[1], edge });
+                            if (Objects.nonNull(masses)) {
+                                return masses[1] + "(" + edge.toString() + ")";
+                            }
+                            return edge.toString();
+                        }).collect(Collectors.joining("→"));
+                    } else {
+                        edgesHeader += passedEdges.stream().map(edge -> edge.toString())
+                            .collect(Collectors.joining("→"));
+                    }
+                    this.inline("div", "<h1 title='拡張版を途中から読み込む'>通過マス: " + edgesHeader + "</h1>", new String[] { "title" });
+                }
+            }
+        }
 
         // 結果
         this.inline("div", "<h2>結果</h2>", sectionTitleClass);
