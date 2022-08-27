@@ -52,7 +52,7 @@ public class CalcAA {
             this.put(24, new AA_CI(3, 1.25));  // 高角砲/機銃(非特殊機銃)(天龍型改二)
             this.put(25, new AA_CI(7, 1.55));  // 新噴進砲/対空電探/三式弾(伊勢型改)
             this.put(26, new AA_CI(6, 1.4));   // 10cm連装高角砲改＋増設機銃/対空電探(大和型改二)
-            this.put(27, new AA_CI(0, 1));     //
+            this.put(27, new AA_CI(5, 1.55));  // 高角砲+増設機銃/噴進砲改二/対空電探(大淀改)
             this.put(28, new AA_CI(4, 1.4));   // 新噴進砲/対空電探(伊勢型改/武蔵改)
             this.put(29, new AA_CI(5, 1.55));  // 高角砲/対空電探(浜風乙改/磯風乙改)
             this.put(30, new AA_CI(3, 1.3));   // 高角砲x3(天龍改二/Gotland改)

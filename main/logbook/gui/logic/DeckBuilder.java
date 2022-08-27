@@ -184,6 +184,7 @@ public class DeckBuilder {
                     JsonObjectBuilder ship = Json.createObjectBuilder();
                     ship.add("id", Integer.toString(ships.get(shipIdx).getShipInfo().getShipId()));
                     ship.add("lv", ships.get(shipIdx).getLv());
+                    ship.add("hp", ships.get(shipIdx).getMaxhp());
                     ship.add("luck", ships.get(shipIdx).getLucky());
                     JsonObjectBuilder items = Json.createObjectBuilder();
                     List<ItemDto> item2 = ships.get(shipIdx).getItem2();

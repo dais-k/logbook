@@ -172,8 +172,10 @@ public class AirBattleDto {
                 return "25:噴進砲改二/電探/三式弾";
             case 26:
                 return "26:高角砲+増設機銃/電探";
+            case 27:
+                return "27:高角砲+増設機銃/噴進砲改二/電探";
             case 28:
-                return "28:新噴進砲/対空電探";
+                return "28:新噴進砲/電探";
             case 29:
                 return "29:高角砲/電探";
             case 30:
