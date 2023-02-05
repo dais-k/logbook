@@ -35,7 +35,7 @@ public class ItemType {
             this.put(19, "機関部強化");
             this.put(20, "上陸用舟艇");
             this.put(21, "回転翼機");
-            this.put(22, "指揮連絡機");
+            this.put(22, "対潜哨戒機");
             this.put(23, "追加装甲");
             this.put(24, "探照灯");
             this.put(25, "簡易輸送部材");
@@ -52,15 +52,15 @@ public class ItemType {
             this.put(36, "特型内火艇");
             this.put(37, "陸上攻撃機");
             this.put(38, "局地戦闘機");
-            this.put(39, "噴式戦闘爆撃機");
-            this.put(40, "噴式戦闘爆撃機");
+            this.put(39, "噴式戦闘爆撃機(噴式景雲改)");
+            this.put(40, "噴式戦闘爆撃機(橘花改)");
             this.put(41, "輸送機材");
             this.put(42, "潜水艦装備");
             this.put(43, "水上戦闘機");
             this.put(44, "陸軍戦闘機");
             this.put(45, "夜間戦闘機");
             this.put(46, "夜間攻撃機");
-            this.put(47, "陸上攻撃機");
+            this.put(47, "陸上対潜哨戒機");
             this.put(48, "陸上攻撃機(襲撃機)");
             this.put(49, "大型陸上機");
             this.put(50, "夜間偵察機");

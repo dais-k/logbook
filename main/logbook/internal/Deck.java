@@ -121,7 +121,6 @@ public final class Deck {
             this.put(105, "小笠原沖戦闘哨戒");
             this.put(106, "<UNKNOWN>");
             this.put(107, "<UNKNOWN>");
-            this.put(107, "<UNKNOWN>");
             this.put(108, "<UNKNOWN>");
             this.put(109, "<UNKNOWN>");
             this.put(110, "南西方面航空偵察作戦");

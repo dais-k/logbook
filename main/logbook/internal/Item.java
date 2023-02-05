@@ -423,7 +423,7 @@ public class Item {
 
     public static void dumpCSV(OutputStreamWriter fw) throws IOException {
         fw.write(StringUtils.join(new String[]{
-                        "名前", "ID", "大分類", "種別", "装備種別", "表示分類", "火力", "雷装", "爆装", "対空", "対潜", "索敵", "命中", "射程", "運", "雷撃命中"},
+                        "名前", "ID", "大分類", "種別", "装備種別", "表示分類", "火力", "雷装", "爆装", "対空", "対潜", "索敵", "命中", "射程", "運", "装甲"},
                 ','));
         fw.write("\n");
 

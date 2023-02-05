@@ -215,8 +215,8 @@ public class BattleFilterDialog extends WindowBase {
         }
 
         // SPACE
-        new Label(shell, SWT.NONE);
-        new Label(shell, SWT.NONE);
+        //new Label(shell, SWT.NONE);
+        //new Label(shell, SWT.NONE);
 
         // 時刻
         Label startLabel = new Label(shell, SWT.NONE);
