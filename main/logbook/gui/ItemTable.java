@@ -54,7 +54,7 @@ public final class ItemTable extends AbstractTableDialog {
         this.itemtext = new Combo(this.shell, SWT.DROP_DOWN | SWT.READ_ONLY);
         List<String> itemTypeNames = new ArrayList<>(ItemType.getAll().values());
         itemTypeNames.add(0, "全て");
-        this.itemtext.setItems(itemTypeNames.toArray(String[]::new));
+        this.itemtext.setItems(itemTypeNames.toArray(new String[0]));
         this.itemtext.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
