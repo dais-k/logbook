@@ -67,6 +67,10 @@ public class ItemType {
         }
     };
 
+    public static Map<Integer, String> getAll() {
+        return ITEMTYPE;
+    }
+
     /**
      * アイテム種別を取得します
      * 

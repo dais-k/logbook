@@ -5,8 +5,12 @@ import logbook.data.Data;
 import logbook.data.DataType;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.internal.ItemType;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.SwtUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -30,57 +34,6 @@ import org.eclipse.swt.widgets.TableItem;
 public final class ItemTable extends AbstractTableDialog {
     private Combo itemtext;
     private int SelectedEquipType = 0;
-    String[] EQUIP_ITEMS = { "全て", 
-    		"小口径主砲",
-            "中口径主砲",
-            "大口径主砲",
-            "副砲",
-            "魚雷",
-            "艦上戦闘機",
-            "艦上爆撃機",
-            "艦上攻撃機",
-            "艦上偵察機",
-            "水上偵察機",
-            "電波探信儀",
-            "対空強化弾",
-            "徹甲弾",
-            "ダメコン",
-            "機銃",
-            "高角砲",
-            "爆雷投射機",
-            "ソナー",
-            "機関部強化",
-            "上陸用舟艇",
-            "回転翼機",
-            "対潜哨戒機",
-            "追加装甲",
-            "探照灯",
-            "簡易輸送部材",
-            "艦艇修理施設",
-            "照明弾",
-            "司令部施設",
-            "航空要員",
-            "高射装置",
-            "対地装備",
-            "水上艦要員",
-            "大型飛行艇",
-            "戦闘食料",
-            "洋上補給",
-            "特型内火艇",
-            "陸上攻撃機",
-            "局地戦闘機",
-            "噴式戦闘爆撃機(噴式景雲改)",
-            "噴式戦闘爆撃機(橘花改)",
-            "輸送機材",
-            "潜水艦装備",
-            "水上戦闘機",
-            "陸軍戦闘機",
-            "夜間戦闘機",
-            "夜間攻撃機",
-            "陸上対潜哨戒機",
-            "陸上攻撃機(襲撃機)",
-            "大型陸上機",
-            "夜間偵察機" };
 
     /**
      * @param parent
@@ -98,8 +51,10 @@ public final class ItemTable extends AbstractTableDialog {
         shellLayout.marginBottom = 1;
         shellLayout.horizontalSpacing = 1;
         this.shell.setLayout(shellLayout);
-        this.itemtext = new Combo(this.shell, SWT.DROP_DOWN);
-        this.itemtext.setItems(this.EQUIP_ITEMS);
+        this.itemtext = new Combo(this.shell, SWT.DROP_DOWN | SWT.READ_ONLY);
+        List<String> itemTypeNames = new ArrayList<>(ItemType.getAll().values());
+        itemTypeNames.add(0, "全て");
+        this.itemtext.setItems(itemTypeNames.toArray(String[]::new));
         this.itemtext.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
