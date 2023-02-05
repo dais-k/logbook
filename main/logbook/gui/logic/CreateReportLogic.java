@@ -14,11 +14,18 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import logbook.internal.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -44,6 +51,10 @@ import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.UseItemDto;
+import logbook.internal.BattleResultFilter;
+import logbook.internal.BattleResultServer;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
 import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.BattleLogProxy;
 import logbook.scripting.ItemInfoListener;
@@ -319,7 +330,7 @@ public final class CreateReportLogic {
      * @return 内容
      */
     @SuppressWarnings("rawtypes")
-    public static List<Comparable[]> getItemListBody() {
+    public static List<Comparable[]> getItemListBody(int EquipType) {
         // ItemInfoを作成してスクリプトに渡す
         Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
 
@@ -355,6 +366,10 @@ public final class CreateReportLogic {
         ItemInfoListener script = ItemInfoProxy.get();
         script.begin();
         for (ItemInfo itemInfo : countitems) {
+            int itemtype = itemInfo.getInfo().getType3(); //種別フィルタ処理
+            if ((EquipType > 0) && (EquipType != itemtype)) {
+                continue;
+            }
             body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(1, itemInfo) },
                     script.body(itemInfo)));
