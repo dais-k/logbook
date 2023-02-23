@@ -64,6 +64,7 @@ public class ItemType {
             this.put(48, "陸上攻撃機(襲撃機)");
             this.put(49, "大型陸上機");
             this.put(50, "夜間偵察機");
+            this.put(51, "夜間水上爆撃機");
         }
     };
 
@@ -73,7 +74,7 @@ public class ItemType {
 
     /**
      * アイテム種別を取得します
-     * 
+     *
      * @param type ID
      * @return アイテム種別
      */
