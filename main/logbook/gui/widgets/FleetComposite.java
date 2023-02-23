@@ -877,13 +877,17 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, AppConstants.MESSAGE_COMBINED, messageStyle);
         }
         this.addStyledText(this.message, "\n", null);
+        // 合計Lv
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
+
+        this.addStyledText(this.message, "\n", null);
         // 制空
         SeikuString seikuString = new SeikuString(ships);
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seikuString.toString()),
                 null);
         if (lostPlanes > 0) {
             this.addStyledText(this.message,
-                    MessageFormat.format("損失機:{0}(ボーキ:{1})", lostPlanes, lostPlanes * 5), null);
+                    MessageFormat.format("\n損失機:{0}(ボーキ:{1})", lostPlanes, lostPlanes * 5), null);
         }
         this.addStyledText(this.message, "\n", null);
         // 索敵
@@ -908,16 +912,13 @@ public class FleetComposite extends Composite {
                 }
             }
             this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_AA, calcAA.getFleetAirDefenseValue(aaShips, true, 1)),
-                    null);
+                    MessageFormat.format(AppConstants.MESSAGE_AA, calcAA.getFleetAirDefenseValue(aaShips,true,1)), null);
             this.addStyledText(this.message, "\n", null);
         }
         // 遠征
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_EXPEDITION, totalFirepower,
                 totalAA, totalASW, totalLOS), null);
         this.addStyledText(this.message, "\n", null);
-        // 合計Lv
-        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
         // 航空偵察スコア
         AviationDetectionString aviationDetectionString = new AviationDetectionString(ships);
@@ -931,19 +932,27 @@ public class FleetComposite extends Composite {
             // ドラム缶合計数
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_DRAM, dram, dramKanmusu),
                     null);
+	        if (daihatsu.getUp() > 0.0) {
+	            this.addStyledText(this.message, " / ", null);
+		}
+		else {
+	            this.addStyledText(this.message, "\n", null);
+		}
         }
         if (daihatsu.getUp() > 0.0) {
             // 大発合計数
             this.addStyledText(this.message, daihatsu.toString(), null);
+            this.addStyledText(this.message, "\n", null);
         }
 
         // TP獲得量
         this.addStyledText(this.message, new TPString(ships).toString(), null);
 
         this.addStyledText(this.message, "\n", null);
+
+        // 前回の遠征
         if ((currentMission != null) && (currentMission.getMission() == null)
                 && (previousMission.getMission() != null)) {
-            // 前回の遠征
             String text = previousMission.getDisplayText("missioncheck_" + dock.getId() + "p");
             this.addStyledText(this.message,
                     MessageFormat.format(AppConstants.MESSAGE_PREVIOUS_MISSION, text), null);

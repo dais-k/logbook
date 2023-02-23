@@ -700,7 +700,7 @@ public final class GlobalContext {
             // 友軍艦隊
             case SET_FRIENDLY_REQUEST:
                 doSetFriendlyRequest(data, apidata);
-                // 保有装備
+            // 保有装備
             case SLOTITEM_MEMBER:
                 doSlotitemMember(data, apidata);
                 break;
@@ -804,7 +804,7 @@ public final class GlobalContext {
             case LD_AIRBATTLE:
                 doBattle(data, apidata, BattlePhaseKind.LD_AIRBATTLE);
                 break;
-            // 海戦
+            // 海戦レーダー射撃
             case LD_SHOOTING:
                 doBattle(data, apidata, BattlePhaseKind.LD_SHOOTING);
                 break;
@@ -816,7 +816,7 @@ public final class GlobalContext {
             case COMBINED_LD_AIRBATTLE:
                 doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_AIR);
                 break;
-            // 海戦
+            // 海戦レーダー射撃
             case COMBINED_LD_SHOOTING:
                 doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_SHOOTING);
                 break;
@@ -907,7 +907,7 @@ public final class GlobalContext {
                 break;
             case SELECT_EVENTMAP_RANK:
                 doSelectEventmapRank(data, apidata);
-                // 遠征情報
+            // 遠征情報
             case MISSION:
                 doMission(data, apidata);
                 break;
@@ -950,7 +950,7 @@ public final class GlobalContext {
             // 基地航空隊情報
             case BASE_AIR_CORPS:
                 doBaseAirCorps(data, apidata);
-                // 基地航空隊:中隊設定
+            // 基地航空隊:中隊設定
             case SET_PLANE:
                 doSetPlaneAndSupply(data, apidata);
                 break;

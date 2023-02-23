@@ -78,7 +78,7 @@ public class TPString implements Comparable<TPString> {
     public String toString() {
         int S = this.TP;
         int A = (int) (this.TP * 0.7);
-        return String.format("TP獲得量: S %d / A %d。", S, A);
+        return String.format("TP獲得量: S %d / A %d", S, A);
     }
 
     private int toTPfromShipType(int type) {

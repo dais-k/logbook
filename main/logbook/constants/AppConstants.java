@@ -21,7 +21,7 @@ public class AppConstants {
     public static final String NAME = "航海日誌";
 
     /** 派生版の名前 */
-    public static final String SUFFIX = "拡張版";
+    public static final String SUFFIX = "拡張版mod";
 
     /** バージョン */
     public static final String VERSION = "2.5.7.41";
@@ -34,7 +34,8 @@ public class AppConstants {
             .create("https://api.github.com/repos/Nishisonic/logbook/releases/latest");
 
     /** マップセル */
-    public static final URI MAP_EDGES_URI = URI.create("https://cdn.jsdelivr.net/gh/KC3Kai/KC3Kai@master/src/data/edges.json");
+    public static final URI MAP_EDGES_URI = URI
+            .create("https://cdn.jsdelivr.net/gh/KC3Kai/KC3Kai@master/src/data/edges.json");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -338,28 +339,28 @@ public class AppConstants {
     public static final String MESSAGE_COMBINED = "連合艦隊編成中。";
 
     /** メッセージ 制空値:{0} */
-    public static final String MESSAGE_SEIKU = "制空値:{0}。";
+    public static final String MESSAGE_SEIKU = "制空値:{0}";
 
     /** メッセージ 索敵:{0}+{1} */
-    public static final String MESSAGE_SAKUTEKI = "索敵:{0}。";
+    public static final String MESSAGE_SAKUTEKI = "索敵:{0}";
 
     /** メッセージ 対潜:{0} */
-    public static final String MESSAGE_TAISEN = "対潜:{0}。";
+    public static final String MESSAGE_TAISEN = "対潜:{0}";
 
     /** メッセージ 対空:{0} */
-    public static final String MESSAGE_TAIKU = "対空:{0}。";
+    public static final String MESSAGE_TAIKU = "対空:{0}";
 
-    /** メッセージ 遠征[火力:{0} / 対空:{1} / 対潜:{2} / 索敵:{3}] */
-    public static final String MESSAGE_EXPEDITION = "遠征[火力:{0,number,0.0} / 対空:{1,number,0.0} / 対潜:{2,number,0.0} / 索敵:{3,number,0.0}]。";
+    /** メッセージ 装備合計：火力:{0} / 対空:{1} / 対潜:{2} / 索敵:{3} */
+    public static final String MESSAGE_EXPEDITION = "遠征用 火力:{0,number,0.0} / 対空:{1,number,0.0} / 対潜:{2,number,0.0} / 索敵:{3,number,0.0}";
 
-    /** メッセージ  艦隊合計Lv:{0} */
-    public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
+    /** メッセージ 艦隊合計Lv:{0} */
+    public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}";
 
     /** メッセージ 艦隊防空値:{0} */
-    public static final String MESSAGE_AA = "艦隊防空値:{0}。";
+    public static final String MESSAGE_AA = "艦隊防空値:{0}";
 
     /** メッセージ  航空偵察スコア:{0} */
-    public static final String MESSAGE_AVIATION_DETECTION = "航空偵察スコア:{0}。";
+    public static final String MESSAGE_AVIATION_DETECTION = "航空偵察スコア:{0}";
 
     /** Push 通知のアプリケーション名*/
     public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
@@ -380,10 +381,10 @@ public class AppConstants {
     public static final String NOTIFY_LINE_URI = "https://notify-api.line.me/api/notify";
 
     /** メッセージ  ドラム缶:{0} ({1}隻) */
-    public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)。";
+    public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)";
 
     /** メッセージ  大発:{0} (+{1}%) */
-    public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)。";
+    public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
 
     /** メッセージ  前回の遠征:{0} (+{1}%) */
     public static final String MESSAGE_PREVIOUS_MISSION = "前回の遠征:{0}";

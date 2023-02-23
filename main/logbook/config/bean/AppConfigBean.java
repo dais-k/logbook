@@ -54,6 +54,9 @@ public final class AppConfigBean {
     /** 母港タブのマップHP表示 */
     private boolean showMapHpInfo = false;
 
+    /** 母港タブの装備/艦娘ボタン表示 */
+    private boolean usePortButton = true;
+
     /** 音量 */
     private float soundLevel = 0.85f;
 
@@ -2398,5 +2401,19 @@ public final class AppConfigBean {
 
     public void setUseAlphabetizeMap(boolean isUseAlphabetizeMap) {
         this.isUseAlphabetizeMap = isUseAlphabetizeMap;
+    }
+
+    /**
+     * @return usePortButton
+     */
+    public boolean isUsePortButton() {
+        return this.usePortButton;
+    }
+
+    /**
+     * @param UsePortButton セットする UsePortButton
+     */
+    public void setUsePortButton(boolean usePortButton) {
+        this.usePortButton = usePortButton;
     }
 }
