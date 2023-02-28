@@ -71,7 +71,7 @@ public class SeikuString implements Comparable<SeikuString> {
                     break;
                 default:
                     // 一式戦 隼II型改(20戦隊)、一式戦 隼III型改(熟練/20戦隊)
-                    if (item.getSlotitemId() == 489 || item.getSlotitemId() == 490) {
+                    if (item.getSlotitemId() == 489 || item.getSlotitemId() == 491) {
                         type = 3;
                     } else {
                         type = -1;
