@@ -88,8 +88,9 @@ public class AirbaseSeikuString {
                 }
                 return new AirPower(0, 0);
             case 49: // 陸上偵察機
-                base = (squadron.getParam().getTaiku() + 0.2 * squadron.getLevel())
-                        * Math.sqrt(squadron.getCount());
+                // 無理やり対応(ちゃんと判明したら対応)
+                base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount())
+                        + (squadron.getLevel() >= 2 ? 1 : 0);
                 constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
@@ -196,8 +197,9 @@ public class AirbaseSeikuString {
                 }
                 return new AirPower(0, 0);
             case 49: // 陸上偵察機
-                base = (squadron.getParam().getTaiku() + 0.2 * squadron.getLevel())
-                        * Math.sqrt(squadron.getCount());
+                // 無理やり対応(ちゃんと判明したら対応)
+                base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount())
+                        + (squadron.getLevel() >= 2 ? 1 : 0);
                 constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
