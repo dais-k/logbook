@@ -798,9 +798,10 @@ public class BattleExDto extends AbstractDto {
             double friendGaugeRate = Math.floor(this.damageRate[0] * 100);
             double enemyGaugeRate = Math.floor(this.damageRate[1] * 100);
 
-            if ((this.kind == BattlePhaseKind.LD_AIRBATTLE) ||
-                    (this.kind == BattlePhaseKind.COMBINED_LD_AIR)) {
-                // 空襲戦
+            if (this.kind == BattlePhaseKind.LD_AIRBATTLE ||
+                    this.kind == BattlePhaseKind.LD_SHOOTING ||
+                    this.kind == BattlePhaseKind.COMBINED_LD_AIR) {
+                // 空襲戦  または レーダー射撃戦
                 // S勝利は発生しないと思われる(完全勝利Sのみ)
                 if (friendGaugeMax <= friendGauge) {
                     return ResultRank.PERFECT;

@@ -17,8 +17,9 @@ public class SeikuString implements Comparable<SeikuString> {
 
     private static int[][] alevelBonusTable = new int[][] {
             { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機、水上戦闘機、夜間戦闘機
-            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、噴式戦闘爆撃機
+            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、噴式戦闘爆撃機、陸上偵察機
             { 0, 0, 1, 1, 1, 3, 3, 6 }, // 水上爆撃機
+            { 0, 0, 2, 5, 9, 14, 14, 22 }, // 一式戦 隼II型改(20戦隊)
     };
 
     private static int[] internalAlevelTable = new int[] {
@@ -69,7 +70,12 @@ public class SeikuString implements Comparable<SeikuString> {
                     type = 2;
                     break;
                 default:
-                    type = -1;
+                    // 一式戦 隼II型改(20戦隊)
+                    if (item.getSlotitemId() == 489) {
+                        type = 3;
+                    } else {
+                        type = -1;
+                    }
                     break;
                 }
 

@@ -554,7 +554,7 @@ public class BattleAtackDto {
         case 104:
             return "僚艦夜戦突撃";
         case 200:
-            return "瑞雲立体攻撃";
+            return "夜間瑞雲夜戦カットイン";
         case 201:
             return "海空立体攻撃";
         case 300:
