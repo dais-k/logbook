@@ -115,6 +115,19 @@ public class AirbaseSeikuString {
             p.add(v);
             return p;
         });
+
+        int reconBonus = squadrons.stream().mapToInt(squadron -> {
+            int search = squadron.getParam().getSakuteki();
+            switch (squadron.getType2()) {
+            case 49: // 陸上偵察機
+                if (search >= 9)
+                    return 118;
+                return 115; // search = 8
+            }
+            return 100;
+        }).max().orElse(100);
+        power.setMin(power.getMin() * reconBonus / 100);
+        power.setMax(power.getMax() * reconBonus / 100);
         return power;
     }
 
@@ -211,7 +224,7 @@ public class AirbaseSeikuString {
             return p;
         });
 
-        int defenseBonus = squadrons.stream().mapToInt(squadron -> {
+        int reconBonus = squadrons.stream().mapToInt(squadron -> {
             int search = squadron.getParam().getSakuteki();
             switch (squadron.getType2()) {
             case 9: // 艦上偵察機
@@ -234,8 +247,8 @@ public class AirbaseSeikuString {
             }
             return 100;
         }).max().orElse(100);
-        power.setMin(power.getMin() * defenseBonus / 100);
-        power.setMax(power.getMax() * defenseBonus / 100);
+        power.setMin(power.getMin() * reconBonus / 100);
+        power.setMax(power.getMax() * reconBonus / 100);
 
         return power;
     }
