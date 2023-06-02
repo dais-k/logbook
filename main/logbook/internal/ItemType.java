@@ -65,6 +65,9 @@ public class ItemType {
             this.put(49, "大型陸上機");
             this.put(50, "夜間偵察機");
             this.put(51, "夜間水上爆撃機");
+            this.put(52, "陸戦部隊");
+            this.put(53, "未実装");
+            this.put(54, "艦載発煙装置");
         }
     };
 

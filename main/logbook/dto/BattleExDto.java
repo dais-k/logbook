@@ -102,6 +102,9 @@ public class BattleExDto extends AbstractDto {
     @Tag(15)
     private String formationMatch = "不明";
 
+    @Tag(141)
+    private int smokeType = 0;
+
     /** 索敵状態（味方・敵） */
     @Tag(16)
     private String sakuteki[];
@@ -223,6 +226,11 @@ public class BattleExDto extends AbstractDto {
 
     @Tag(133)
     private LinkedList<Integer> passedEdges = new LinkedList<>();
+
+    @Tag(123)
+    private int[] enemy_NowHp;
+    @Tag(124)
+    private int[] enemy_MaxHp;
 
     static {
         // 敵艦IDが+1000された日時
@@ -798,16 +806,10 @@ public class BattleExDto extends AbstractDto {
             double friendGaugeRate = Math.floor(this.damageRate[0] * 100);
             double enemyGaugeRate = Math.floor(this.damageRate[1] * 100);
 
-<<<<<<< HEAD
             if ((this.kind == BattlePhaseKind.LD_AIRBATTLE) ||
                     (this.kind == BattlePhaseKind.COMBINED_LD_AIR) ||
                     (this.kind == BattlePhaseKind.LD_SHOOTING) ||
                     (this.kind == BattlePhaseKind.COMBINED_LD_SHOOTING)) {
-=======
-            if (this.kind == BattlePhaseKind.LD_AIRBATTLE ||
-                    this.kind == BattlePhaseKind.LD_SHOOTING ||
-                    this.kind == BattlePhaseKind.COMBINED_LD_AIR) {
->>>>>>> 4ec59a404e27e194ceb0a5060974a1f4a9967329
                 // 空襲戦  または レーダー射撃戦
                 // S勝利は発生しないと思われる(完全勝利Sのみ)
                 if (friendGaugeMax <= friendGauge) {
@@ -1568,6 +1570,30 @@ public class BattleExDto extends AbstractDto {
             this.startEnemyHp = new int[numEships];
             this.maxFriendHp = new int[numFships];
             this.maxEnemyHp = new int[numEships];
+            
+            this.enemy_NowHp = new int[numEships];
+            this.enemy_MaxHp = new int[numEships];
+          
+            for (int i = 0; i < enowhps.size(); i++) {
+                try {
+                    this.enemy_NowHp[i] = enowhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_NowHp[i] = 50;
+                }
+            }
+            
+            for (int i = 0; i < emaxhps.size(); i++) {
+                try {
+                    this.enemy_MaxHp[i] = emaxhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_MaxHp[i] = 50;
+                }        
+            }
+          
             if (isFriendCombined) {
                 this.startFriendHpCombined = new int[numFshipsCombined];
                 this.maxFriendHpCombined = new int[numFshipsCombined];
@@ -1612,6 +1638,11 @@ public class BattleExDto extends AbstractDto {
                 this.formationMatch = toMatch(formation.getInt(2));
             }
 
+            // 煙幕
+            if (object.containsKey("api_smoke_type")) {
+                this.smokeType = object.getInt("api_smoke_type");
+            }
+
             // 索敵
             JsonArray jsonSearch = JsonUtils.getJsonArray(object, "api_search");
             if (jsonSearch != null) {
@@ -1629,8 +1660,8 @@ public class BattleExDto extends AbstractDto {
                     this.friendGaugeMax += this.startFriendHp[i] = fnowhps.getInt(i);
                 }
                 for (int i = 0; i < numEships; i++) {
-                    this.maxEnemyHp[i] = emaxhps.getInt(i);
-                    this.enemyGaugeMax += this.startEnemyHp[i] = enowhps.getInt(i);
+                    this.maxEnemyHp[i] = this.enemy_MaxHp[i];
+                    this.enemyGaugeMax += this.startEnemyHp[i] = this.enemy_NowHp[i];
                 }
                 for (int i = 0; i < numFshipsCombined; i++) {
                     this.maxFriendHpCombined[i] = fmaxhpsCombined.getInt(i);
@@ -2197,6 +2228,14 @@ public class BattleExDto extends AbstractDto {
      */
     public String getFormationMatch() {
         return this.formationMatch;
+    }
+
+    /**
+     * 煙幕タイプ
+     * @return int
+     */
+    public int getSmokeType() {
+        return this.smokeType;
     }
 
     /**

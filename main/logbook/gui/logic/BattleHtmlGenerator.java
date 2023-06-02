@@ -528,6 +528,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             fSakuteki = battle.getSakuteki()[0];
             eSakuteki = battle.getSakuteki()[1];
         }
+        // 手抜き
+        String smokeType = battle.getSmokeType() > 0 ? "発生(" + battle.getSmokeType() + "重)" : "なし";
 
         this.inline("span", "会敵: " + battle.getFormationMatch(), null);
         this.begin("table", null);
@@ -535,16 +537,19 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("th", "", null);
         this.inline("th", "陣形", null);
         this.inline("th", "索敵", null);
+        this.inline("th", "煙幕", null);
         this.end(); // tr
         this.begin("tr", FORMATION_CLASS[0]);
         this.inline("td", "自", null);
         this.inline("td", battle.getFormation()[0], null);
         this.inline("td", fSakuteki, null);
+        this.inline("td", smokeType, null);
         this.end(); // tr
         this.begin("tr", FORMATION_CLASS[1]);
         this.inline("td", "敵", null);
         this.inline("td", battle.getFormation()[1], null);
         this.inline("td", eSakuteki, null);
+        this.inline("td", "", null);
         this.end(); // tr
         this.end(); // table
     }
@@ -1127,7 +1132,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.inline("h3", "自軍攻撃", null);
         }
 
-        if (phase.getAirBaseInjection() != null || phase.getAirBase() != null) {
+        if ((phase.getAirBaseInjection() != null || phase.getAirBase() != null) && battle.getAirbases() != null) {
             this.inline("h3", "基地航空隊", null);
             this.genAirbaseSlotitemTable(battle.getAirbases(), battle.getMapCellDto(), battle.getStartAirbase());
         }
@@ -1156,7 +1161,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             }
         }
 
-        // 航空戦 → 支援艦隊による攻撃 →　開幕対潜 → 開幕 → 航空戦２回目
+        // 航空戦 → 支援艦隊による攻撃 → 開幕対潜 → 開幕 → 航空戦２回目
         for (int i = 0; i < airList.size(); ++i) {
             this.genAirBattle(airList.get(i), "航空戦(" + (i + 1) + "/" + airList.size() + ")",
                     friendShips, enemyShips, friendHp, enemyHp);
@@ -1220,6 +1225,17 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.inline("td", flare[1], null);
                 this.end(); // tr
                 this.end(); // table
+            }
+            // 開幕夜戦
+            if (hougekiList.isEmpty()) {
+                if (phase.getSupport() != null) {
+                    for (BattleAtackDto atack : phase.getSupport()) {
+                        this.inline("span", "支援艦隊による攻撃", null);
+                        this.begin("table", DAMAGE_TABLE_CLASS[1]);
+                        this.genDamageTableContent(atack, enemyShips, enemyHp);
+                        this.end(); // table
+                    }
+                }
             }
 
             this.inline("h3", "砲雷撃", null);

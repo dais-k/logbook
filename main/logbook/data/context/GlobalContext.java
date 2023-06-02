@@ -1370,7 +1370,7 @@ public final class GlobalContext {
                     JsonNumber m_flg = EventObj.getJsonNumber("api_m_flag");
                     JsonNumber m_flg2 = EventObj.getJsonNumber("api_m_flag2");
                     if ((m_flg != null) && (m_flg2 != null) && (m_flg2.intValue() > 0)) {
-                        addUpdateLog("＊ギミック解除＊敵勢力の弱体化を確認しました！");
+                        addConsole("＊ギミック解除＊敵勢力の弱体化を確認しました！");
                     }
                 }
             }
@@ -1581,7 +1581,7 @@ public final class GlobalContext {
                 JsonNumber m1_flg = apidata.getJsonNumber("api_m1");
                 JsonNumber m2_flg = apidata.getJsonNumber("api_m2");
                 if (((m1_flg != null) && (m1_flg.intValue() != 0)) || ((m2_flg != null) && (m2_flg.intValue() != 0))) {
-                    addUpdateLog("＊ギミック解除＊海域の変化を確認しました！");
+                    addConsole("＊ギミック解除＊海域の変化を確認しました！");
                 }
             }
         } catch (Exception e) {
@@ -2731,14 +2731,15 @@ public final class GlobalContext {
                     int[] map = mapCellDto.getMap();
                     if (AppConfig.get().isUseAlphabetizeMap() && Objects.nonNull(map)) {
                         String s = Arrays.stream(strikePoint.split(",")).map((point) -> {
-                            String[] mapEdge = MapEdges.get(new int[]{map[0], map[1], Integer.parseInt(point)});
-                            if (Objects.nonNull(mapEdge) && mapEdge.length > 1) {
+                            String[] mapEdge = MapEdges.get(new int[] { map[0], map[1], Integer.parseInt(point) });
+                            if (Objects.nonNull(mapEdge) && (mapEdge.length > 1)) {
                                 return mapEdge[1] + "(" + point + ")";
                             }
                             return point;
                         }).collect(Collectors.joining(","));
                         addConsole("基地航空隊 " + i + " -> " + s);
-                    } else {
+                    }
+                    else {
                         addConsole("基地航空隊 " + i + " -> " + strikePoint);
                     }
                 }
@@ -2857,7 +2858,7 @@ public final class GlobalContext {
      */
     private static void doSelectEventmapRank(Data data, JsonValue json) {
         try {
-            int mapId = Integer.parseInt(data.getField("api_maparea_id")) * 10
+            int mapId = (Integer.parseInt(data.getField("api_maparea_id")) * 10)
                     + Integer.parseInt(data.getField("api_map_no"));
             int difficulty = Integer.parseInt(data.getField("api_rank"));
             JsonObject api = ((JsonObject) json);
@@ -2867,7 +2868,7 @@ public final class GlobalContext {
             int gaugeIndex = api.containsKey("api_gauge_num") ? api.getInt("api_gauge_num") : -1;
             ListIterator<MapHpInfoDto> iterator = mapHpInfo.listIterator();
             while (iterator.hasNext()) {
-                MapHpInfoDto _mapHpInfo = (MapHpInfoDto) iterator.next();
+                MapHpInfoDto _mapHpInfo = iterator.next();
                 if (_mapHpInfo.getMapId() == mapId) {
                     iterator.set(
                             new MapHpInfoDto(mapId, difficulty, 0, -1, -1, nowMapHp, maxMapHp, gaugeIndex, gaugeType));
@@ -3022,7 +3023,7 @@ public final class GlobalContext {
                 int areaId = Integer.parseInt(data.getField("api_area_id"));
                 int baseId = Integer.parseInt(data.getField("api_base_id"));
                 for (AirbaseDto airbase : airbases) {
-                    if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                    if ((airbase.getAreaId() == areaId) && (airbase.getRid() == baseId)) {
                         List<SquadronDto> newPlaneInfos = apidata.getJsonArray("api_plane_info").stream()
                                 .map(JsonObject.class::cast)
                                 .map(planeInfo -> new SquadronDto(itemMap.get(planeInfo.getInt("api_slotid")),
@@ -3059,7 +3060,7 @@ public final class GlobalContext {
 
             for (int i = 0; i < baseIds.length; i++) {
                 for (AirbaseDto airbase : airbases) {
-                    if (airbase.getAreaId() == areaId && airbase.getRid() == baseIds[i]) {
+                    if ((airbase.getAreaId() == areaId) && (airbase.getRid() == baseIds[i])) {
                         airbase.setActionKind(actionKinds[i]);
                         break;
                     }
@@ -3079,7 +3080,7 @@ public final class GlobalContext {
             int baseId = Integer.parseInt(data.getField("api_base_id"));
             String name = data.getField("api_name");
             for (AirbaseDto airbase : airbases) {
-                if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                if ((airbase.getAreaId() == areaId) && (airbase.getRid() == baseId)) {
                     airbase.setName(name);
                     break;
                 }
@@ -3103,7 +3104,7 @@ public final class GlobalContext {
                 for (JsonObject base : bases) {
                     int baseId = base.getInt("api_rid");
                     for (AirbaseDto airbase : airbases) {
-                        if (airbase.getAreaId() == areaId && airbase.getRid() == baseId) {
+                        if ((airbase.getAreaId() == areaId) && (airbase.getRid() == baseId)) {
                             airbase.setDistanceBase(base.getJsonObject("api_distance").getInt("api_base"));
                             airbase.setDistanceBonus(base.getJsonObject("api_distance").getInt("api_bonus"));
                             List<SquadronDto> newPlaneInfos = base.getJsonArray("api_plane_info").stream()
