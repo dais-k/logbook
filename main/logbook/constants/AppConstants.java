@@ -17,14 +17,14 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class AppConstants {
 
-    /**　アプリケーション名 */
+    /** アプリケーション名 */
     public static final String NAME = "航海日誌";
 
     /** 派生版の名前 */
     public static final String SUFFIX = "拡張版mod";
 
     /** バージョン */
-    public static final String VERSION = "2.5.7.41";
+    public static final String VERSION = "2.5.7.44";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("https://github.com/Nishisonic/logbook/releases");

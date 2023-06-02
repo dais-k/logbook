@@ -14,8 +14,9 @@ public class AirbaseSeikuString {
 
     private static int[][] alevelBonusTable = new int[][] {
             { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機、水上戦闘機、夜間戦闘機
-            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、噴式戦闘爆撃機
+            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、噴式戦闘爆撃機、陸上偵察機
             { 0, 0, 1, 1, 1, 3, 3, 6 }, // 水上爆撃機
+            { 0, 0, 2, 5, 9, 14, 14, 22 }, // 一式戦 隼II型改(20戦隊)、一式戦 隼III型改(熟練/20戦隊)
     };
 
     private static int[] internalAlevelTable = new int[] {
@@ -74,10 +75,28 @@ public class AirbaseSeikuString {
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
                 break;
-            default: // 偵察機etc.
-                // 陸上偵察機無理やり対応(ちゃんと判明したら対応)
+            case 25: // オートジャイロ
+                return new AirPower(0, 0);
+            case 26: // 対潜哨戒機
+                if (squadron.getSlotitemId() == 489 || squadron.getSlotitemId() == 491) {
+                    // 一式戦 隼II型改(20戦隊)、一式戦 隼III型改(熟練/20戦隊)
+                    base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount());
+                    constSkilledBonus = alevelBonusTable[3][squadron.getAlv()];
+                    skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
+                            internalAlevelTable[squadron.getAlv() + 1] - 1 };
+                    break;
+                }
+                return new AirPower(0, 0);
+            case 49: // 陸上偵察機
+                // 無理やり対応(ちゃんと判明したら対応)
                 base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount())
-                        + (squadron.getType2() == 49 && squadron.getLevel() >= 2 ? 1 : 0);
+                        + (squadron.getLevel() >= 2 ? 1 : 0);
+                constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
+                skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
+                        internalAlevelTable[squadron.getAlv() + 1] - 1 };
+                break;
+            default:
+                base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount());
                 constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
@@ -97,6 +116,19 @@ public class AirbaseSeikuString {
             p.add(v);
             return p;
         });
+
+        int reconBonus = squadrons.stream().mapToInt(squadron -> {
+            int search = squadron.getParam().getSakuteki();
+            switch (squadron.getType2()) {
+            case 49: // 陸上偵察機
+                if (search >= 9)
+                    return 118;
+                return 115; // search = 8
+            }
+            return 100;
+        }).max().orElse(100);
+        power.setMin(power.getMin() * reconBonus / 100);
+        power.setMax(power.getMax() * reconBonus / 100);
         return power;
     }
 
@@ -152,10 +184,28 @@ public class AirbaseSeikuString {
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
                 break;
-            default: // 偵察機etc.
-                // 陸上偵察機無理やり対応(ちゃんと判明したら対応)
+            case 25: // オートジャイロ
+                return new AirPower(0, 0);
+            case 26: // 対潜哨戒機
+                if (squadron.getSlotitemId() == 489 || squadron.getSlotitemId() == 491) {
+                    // 一式戦 隼II型改(20戦隊)、一式戦 隼III型改(熟練/20戦隊)
+                    base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount());
+                    constSkilledBonus = alevelBonusTable[3][squadron.getAlv()];
+                    skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
+                            internalAlevelTable[squadron.getAlv() + 1] - 1 };
+                    break;
+                }
+                return new AirPower(0, 0);
+            case 49: // 陸上偵察機
+                // 無理やり対応(ちゃんと判明したら対応)
                 base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount())
-                        + (squadron.getType2() == 49 && squadron.getLevel() >= 2 ? 1 : 0);
+                        + (squadron.getLevel() >= 2 ? 1 : 0);
+                constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
+                skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
+                        internalAlevelTable[squadron.getAlv() + 1] - 1 };
+                break;
+            default:
+                base = squadron.getParam().getTaiku() * Math.sqrt(squadron.getCount());
                 constSkilledBonus = alevelBonusTable[1][squadron.getAlv()];
                 skilledBonus = new int[] { internalAlevelTable[squadron.getAlv()],
                         internalAlevelTable[squadron.getAlv() + 1] - 1 };
@@ -176,7 +226,7 @@ public class AirbaseSeikuString {
             return p;
         });
 
-        int defenseBonus = squadrons.stream().mapToInt(squadron -> {
+        int reconBonus = squadrons.stream().mapToInt(squadron -> {
             int search = squadron.getParam().getSakuteki();
             switch (squadron.getType2()) {
             case 9: // 艦上偵察機
@@ -184,9 +234,7 @@ public class AirbaseSeikuString {
                 // case 59: // 噴式偵察機
                 if (search >= 9)
                     return 130;
-                // if (search == 8)
-                //     return 125; // 適当
-                return 120;
+                return 120; // search = 7
             case 10: // 水上偵察機
             case 41: // 大型飛行艇
                 if (search >= 9)
@@ -194,11 +242,15 @@ public class AirbaseSeikuString {
                 if (search == 8)
                     return 113;
                 return 110;
+            case 49: // 陸上偵察機
+                if (search >= 9)
+                    return 123;
+                return 118; // search = 8
             }
             return 100;
         }).max().orElse(100);
-        power.setMin(power.getMin() * defenseBonus / 100);
-        power.setMax(power.getMax() * defenseBonus / 100);
+        power.setMin(power.getMin() * reconBonus / 100);
+        power.setMax(power.getMax() * reconBonus / 100);
 
         return power;
     }
