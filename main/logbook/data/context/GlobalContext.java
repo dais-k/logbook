@@ -24,10 +24,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.CheckForNull;
+import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.json.JsonValue.ValueType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -78,6 +81,7 @@ import logbook.internal.MapEdges;
 import logbook.internal.MasterData;
 import logbook.internal.ResultRecord;
 import logbook.internal.Ship;
+import logbook.internal.UseItem;
 import logbook.internal.ShipParameterRecord.UpdateShipParameter;
 import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
@@ -2709,6 +2713,59 @@ public final class GlobalContext {
                 ApplicationMain.main.updateMapCell(mapCellDto);
                 if (AppConfig.get().isPrintSortieLog())
                     addConsole("行先 " + mapCellDto.toString());
+
+                // 獲得資源表示
+                List<String> texts = new ArrayList<String>();
+                String[] keys = new String[] { "api_itemget", "api_itemget_eo_comment", "api_itemget_eo_result" };
+                for (String key : keys) {
+                    if (apidata.containsKey(key)) {
+                        JsonArray itemGetObjects = null;
+                        // 配列か連想配列の2パターンあるゴミ設計(api_itemget)
+                        if (apidata.get(key).getValueType().equals(ValueType.ARRAY)) {
+                            itemGetObjects = apidata.getJsonArray(key);
+                        }
+                        else {
+                            // 配列にして形式を合わせる
+                            JsonArrayBuilder array = Json.createArrayBuilder();
+                            array.add(apidata.getJsonObject(key));
+                            itemGetObjects = array.build();
+                        }
+                        for (JsonValue itemGetObjectValue : itemGetObjects) {
+                            JsonObject itemJsonObject = (JsonObject) itemGetObjectValue;
+
+                            int id = itemJsonObject.getInt("api_id");
+                            int usemst = itemJsonObject.getInt("api_usemst");
+                            int getcount = itemJsonObject.getInt("api_getcount");
+                            switch (usemst) {
+                            case 2:
+                                // 艦娘
+                                texts.add(Ship.get(id).getName() + "×" + getcount);
+                                break;
+                            case 3:
+                                // 装備
+                                texts.add(Item.get(id).getName() + "×" + getcount);
+                                break;
+                            case 4:
+                                String[] array = new String[] { "燃料", "弾薬", "鋼材", "ボーキサイト",
+                                        "高速建造材", "高速修復材", "開発資材", "改修資材" };
+                                texts.add(array[id - 1] + "×" + getcount);
+                                break;
+                            case 5:
+                                texts.add(UseItem.get(id) + "×" + getcount);
+                                break;
+                            case 6:
+                                // 家具
+                                texts.add("家具(id=" + id + ")×" + getcount);
+                                break;
+                            default:
+                                texts.add("不明(id=" + id + ")×" + getcount);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (AppConfig.get().isPrintItemGetLog() && !texts.isEmpty())
+                    addConsole("獲得資源 " + String.join(", ", texts));
             }
         } catch (Exception e) {
             LOG.get().warn("進撃を更新しますに失敗しました", e);
@@ -2868,7 +2925,7 @@ public final class GlobalContext {
             int gaugeIndex = api.containsKey("api_gauge_num") ? api.getInt("api_gauge_num") : -1;
             ListIterator<MapHpInfoDto> iterator = mapHpInfo.listIterator();
             while (iterator.hasNext()) {
-                MapHpInfoDto _mapHpInfo = iterator.next();
+                MapHpInfoDto _mapHpInfo = (MapHpInfoDto) iterator.next();
                 if (_mapHpInfo.getMapId() == mapId) {
                     iterator.set(
                             new MapHpInfoDto(mapId, difficulty, 0, -1, -1, nowMapHp, maxMapHp, gaugeIndex, gaugeType));

@@ -18,6 +18,11 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.dyuproject.protostuff.Tag;
+
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
@@ -101,9 +106,6 @@ public class BattleExDto extends AbstractDto {
     /** 同航戦とか　*/
     @Tag(15)
     private String formationMatch = "不明";
-
-    @Tag(141)
-    private int smokeType = 0;
 
     /** 索敵状態（味方・敵） */
     @Tag(16)
@@ -231,6 +233,15 @@ public class BattleExDto extends AbstractDto {
     private int[] enemy_NowHp;
     @Tag(124)
     private int[] enemy_MaxHp;
+
+    @Tag(140)
+    private boolean isBalloonCell = false;
+
+    @Tag(141)
+    private int smokeType = 0;
+
+    @Tag(142)
+    private boolean isAtollCell = false;
 
     static {
         // 敵艦IDが+1000された日時
@@ -569,7 +580,7 @@ public class BattleExDto extends AbstractDto {
                     kind.isOpeningSecond(),
                     this.isEnemySecond, true);
 
-            // 開幕
+            // 開幕雷撃
             this.opening = BattleAtackDto.makeRaigeki(baseidx, battle.friendSecondBase,
                     JsonUtils.getJsonObject(object, "api_opening_atack"),
                     kind.isOpeningSecond());
@@ -638,7 +649,7 @@ public class BattleExDto extends AbstractDto {
             this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet, battle);
             this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet, battle);
             this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet, battle);
-            if (isFriendFleet) {
+            if (this.isFriendFleet) {
                 // １つのjsonファイルの中に友軍艦隊の砲撃と自艦隊の砲撃の２つの処理が存在する場合
                 this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet, battle);
                 this.doAtack(this.hougeki, battle.friendSecondBase, false, battle);
@@ -807,8 +818,8 @@ public class BattleExDto extends AbstractDto {
             double enemyGaugeRate = Math.floor(this.damageRate[1] * 100);
 
             if ((this.kind == BattlePhaseKind.LD_AIRBATTLE) ||
-                    (this.kind == BattlePhaseKind.COMBINED_LD_AIR) ||
                     (this.kind == BattlePhaseKind.LD_SHOOTING) ||
+                    (this.kind == BattlePhaseKind.COMBINED_LD_AIR) ||
                     (this.kind == BattlePhaseKind.COMBINED_LD_SHOOTING)) {
                 // 空襲戦  または レーダー射撃戦
                 // S勝利は発生しないと思われる(完全勝利Sのみ)
@@ -1570,30 +1581,30 @@ public class BattleExDto extends AbstractDto {
             this.startEnemyHp = new int[numEships];
             this.maxFriendHp = new int[numFships];
             this.maxEnemyHp = new int[numEships];
-            
+
             this.enemy_NowHp = new int[numEships];
             this.enemy_MaxHp = new int[numEships];
-          
+
             for (int i = 0; i < enowhps.size(); i++) {
                 try {
                     this.enemy_NowHp[i] = enowhps.getInt(i);
-                    
-                } catch(ClassCastException e) {
+
+                } catch (ClassCastException e) {
                     // 50は"N/A"の代替値
                     this.enemy_NowHp[i] = 50;
                 }
             }
-            
+
             for (int i = 0; i < emaxhps.size(); i++) {
                 try {
                     this.enemy_MaxHp[i] = emaxhps.getInt(i);
-                    
-                } catch(ClassCastException e) {
+
+                } catch (ClassCastException e) {
                     // 50は"N/A"の代替値
                     this.enemy_MaxHp[i] = 50;
-                }        
+                }
             }
-          
+
             if (isFriendCombined) {
                 this.startFriendHpCombined = new int[numFshipsCombined];
                 this.maxFriendHpCombined = new int[numFshipsCombined];
@@ -1641,6 +1652,16 @@ public class BattleExDto extends AbstractDto {
             // 煙幕
             if (object.containsKey("api_smoke_type")) {
                 this.smokeType = object.getInt("api_smoke_type");
+            }
+
+            // 阻塞気球マス
+            if (object.containsKey("api_balloon_cell")) {
+                this.isBalloonCell = BooleanUtils.toBoolean(object.getInt("api_balloon_cell"));
+            }
+
+            // 環礁マス
+            if (object.containsKey("api_atoll_cell")) {
+                this.isAtollCell = BooleanUtils.toBoolean(object.getInt("api_atoll_cell"));
             }
 
             // 索敵
@@ -2236,6 +2257,22 @@ public class BattleExDto extends AbstractDto {
      */
     public int getSmokeType() {
         return this.smokeType;
+    }
+
+    /**
+     * 阻塞気球発動可能マスか
+     * @return int
+     */
+    public boolean isBalloonCell() {
+        return this.isBalloonCell;
+    }
+
+    /**
+     * 環礁マスか
+     * @return int
+     */
+    public boolean isAtollCell() {
+        return this.isAtollCell;
     }
 
     /**

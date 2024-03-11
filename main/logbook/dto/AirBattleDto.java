@@ -211,7 +211,7 @@ public class AirBattleDto {
             case 45:
                 return "45:高角砲群集中配備/大和型電探";
             case 46:
-                return "46:35.6cm連装砲改三 or 改四/特殊機銃/対空電探";
+                return "46:35.6改三ダズルor35.6改四/集中機銃/電探";
         }
         return "不明(" + id + ")";
     }

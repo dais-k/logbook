@@ -413,9 +413,6 @@ public final class AppConfigBean {
     /** 所持艦隊晒しの対象をロックしている艦限定にするか */
     private boolean useLockedOnlyFleetFormat = false;
 
-    /** 艦隊分析の対象をロックしている艦/装備に限定するか */
-    private boolean useLockedOnlyAnalysisFormat = false;
-
     /** マンスリー遠征警告を表示するか */
     private boolean showMonthlyExpeditionWarning = false;
 
@@ -433,6 +430,9 @@ public final class AppConfigBean {
 
     /** マップのアルファベット表示を使用するか */
     private boolean isUseAlphabetizeMap = false;
+
+    /** 獲得資源を表示するか */
+    private boolean itemGetLog = false;
 
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
@@ -2317,20 +2317,6 @@ public final class AppConfigBean {
         this.useLockedOnlyFleetFormat = useLockedOnlyFleetFormat;
     }
 
-    /**
-     * @return useLockedOnlyAnalysisFormat
-     */
-    public boolean isUseLockedOnlyAnalysisFormat() {
-        return this.useLockedOnlyAnalysisFormat;
-    }
-
-    /**
-     * @param useLockedOnlyAnalysisFormat セットする useLockedOnlyAnalysisFormat
-     */
-    public void setUseLockedOnlyAnalysisFormat(boolean useLockedOnlyAnalysisFormat) {
-        this.useLockedOnlyAnalysisFormat = useLockedOnlyAnalysisFormat;
-    }
-
     public double getBunkitenKeisu() {
         return this.bunkitenKeisu;
     }
@@ -2401,6 +2387,14 @@ public final class AppConfigBean {
 
     public void setUseAlphabetizeMap(boolean isUseAlphabetizeMap) {
         this.isUseAlphabetizeMap = isUseAlphabetizeMap;
+    }
+
+    public boolean isPrintItemGetLog() {
+        return this.itemGetLog;
+    }
+
+    public void setPrintItemGetLog(boolean itemGetLog) {
+        this.itemGetLog = itemGetLog;
     }
 
     /**

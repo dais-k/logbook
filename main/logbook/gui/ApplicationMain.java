@@ -1160,7 +1160,7 @@ public final class ApplicationMain extends WindowBase {
                     }
                 }
 
-                // 付随しないため
+                // 追随しないため
                 ApplicationMain.this.updateResultRecord(minimum);
                 ApplicationMain.this.updateAirbase(minimum);
 
@@ -1203,7 +1203,7 @@ public final class ApplicationMain extends WindowBase {
         Menu copyDeckBuilderMenu = new Menu(rootCopyDeckBuilder);
 
         final MenuItem copyDeckBuilderURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyDeckBuilderURL.setText("デッキビルダー方式の編成フォーマットをコピー(基地航空隊なし)");
+        copyDeckBuilderURL.setText("デッキビルダー方式の編成フォーマットをコピー(基地航空隊を含まない)");
 
         copyDeckBuilderURL.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1229,7 +1229,7 @@ public final class ApplicationMain extends WindowBase {
             }
         });
         final MenuItem copyDeckBuilderAAURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
-        copyDeckBuilderAAURL.setText("デッキビルダー方式の編成フォーマットをコピー(基地航空隊あり)");
+        copyDeckBuilderAAURL.setText("デッキビルダー方式の編成フォーマットをコピー(基地航空隊を含む)");
 
         copyDeckBuilderAAURL.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -1445,10 +1445,9 @@ public final class ApplicationMain extends WindowBase {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (GlobalContext.getState() == 1) {
-                    boolean isLockedOnlyAnalysisFormat = AppConfig.get().isUseLockedOnlyAnalysisFormat();
                     Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(
-                            new Object[] { new FleetAnalysis().getShipsFormat(isLockedOnlyAnalysisFormat) },
+                            new Object[] { new FleetAnalysis().getShipsFormat() },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1470,10 +1469,9 @@ public final class ApplicationMain extends WindowBase {
             public void widgetSelected(SelectionEvent e) {
 
                 if (GlobalContext.getState() == 1) {
-                    boolean isLockedOnlyAnalysisFormat = AppConfig.get().isUseLockedOnlyAnalysisFormat();
                     Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(
-                            new Object[] { new FleetAnalysis().getItemsFormat(isLockedOnlyAnalysisFormat) },
+                            new Object[] { new FleetAnalysis().getItemsFormat() },
                             new Transfer[] { TextTransfer.getInstance() });
                 }
                 else {
@@ -1487,30 +1485,7 @@ public final class ApplicationMain extends WindowBase {
             }
         });
 
-        //final MenuItem copyItemFormatURL = new MenuItem(copyItemFormatterMenu, SWT.PUSH);
-        //copyItemFormatURL.setText("サイトURLをクリップボードにコピー(サイト閉鎖済)");
-
-        //copyItemFormatURL.addSelectionListener(new SelectionAdapter() {
-        //    @Override
-        //    public void widgetSelected(SelectionEvent e) {
-        //        Clipboard clipboard = new Clipboard(Display.getDefault());
-        //        clipboard.setContents(new Object[] { "https://kancolle-fleetanalysis.firebaseapp.com/#/equipInput" },
-        //                new Transfer[] { TextTransfer.getInstance() });
-        //    }
-        //});
-
-        rootItemFormatter.setMenu(copyItemFormatterMenu);
-
-        new MenuItem(copyItemFormatterMenu, SWT.SEPARATOR);
-        final MenuItem isLockedOnlyAnalysisFormat = new MenuItem(copyItemFormatterMenu, SWT.CHECK);
-        isLockedOnlyAnalysisFormat.setText("ロックしている艦/装備限定");
-        isLockedOnlyAnalysisFormat.setSelection(AppConfig.get().isUseLockedOnlyAnalysisFormat());
-        isLockedOnlyAnalysisFormat.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                AppConfig.get().setUseLockedOnlyAnalysisFormat(isLockedOnlyAnalysisFormat.getSelection());
-            }
-        });
+       rootItemFormatter.setMenu(copyItemFormatterMenu);
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
@@ -2410,7 +2385,12 @@ public final class ApplicationMain extends WindowBase {
             }
         });
         if (airbaseMap.size() > 0) {
-            this.airbaseCombo.select((select < 0) && (select < airbaseMap.size()) ? 0 : select);
+            this.airbaseCombo.select(select < 0 && select < airbaseMap.size() ? 0 : select);
+        }
+        else {
+            this.airbaseCombo.add("基地航空隊");
+            this.airbaseCombo.select(0);
+            return;
         }
 
         String result = "";

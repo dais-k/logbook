@@ -69,7 +69,7 @@ public class ItemType {
             this.put(53, "未実装");
             this.put(54, "艦載発煙装置");
             this.put(55, "阻塞気球");
-            this.put(56, "ジェット局地戦闘機");
+            this.put(56, "噴式局地戦闘機");
         }
     };
 
