@@ -3,15 +3,17 @@
  */
 package logbook.dto;
 
-import com.dyuproject.protostuff.Tag;
-import logbook.internal.Item;
-import logbook.util.JsonUtils;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
+import com.dyuproject.protostuff.Tag;
+
+import logbook.internal.Item;
+import logbook.util.JsonUtils;
 
 /**
  * @author Nekopanda
@@ -57,7 +59,7 @@ public class AirBattleDto {
     public int airBaseId;
 
     private static int[] readPlaneCount(JsonObject stage) {
-        return new int[]{
+        return new int[] {
                 stage.getInt("api_f_lostcount"),
                 stage.getInt("api_f_count"),
                 stage.getInt("api_e_lostcount"),
@@ -71,7 +73,7 @@ public class AirBattleDto {
             this.stage1 = readPlaneCount(jsonStage1);
             JsonArray jsonTouchPlane = JsonUtils.getJsonArray(jsonStage1, "api_touch_plane");
             if (jsonTouchPlane != null) {
-                this.touchPlane = new int[]{
+                this.touchPlane = new int[] {
                         jsonTouchPlane.getInt(0),
                         jsonTouchPlane.getInt(1)
                 };
@@ -85,7 +87,7 @@ public class AirBattleDto {
 
             JsonObject jsonAirFire = JsonUtils.getJsonObject(jsonStage2, "api_air_fire");
             if (jsonAirFire != null) {
-                this.airFire = new int[]{
+                this.airFire = new int[] {
                         jsonAirFire.getInt("api_idx"),
                         jsonAirFire.getInt("api_kind")
                 };
@@ -212,6 +214,10 @@ public class AirBattleDto {
                 return "45:高角砲群集中配備/大和型電探";
             case 46:
                 return "46:35.6改三ダズルor35.6改四/集中機銃/電探";
+            case 47:
+                return "47:12.7cm連装砲C型改三Hx2 or 12.7cm連装砲C型改三H/25mm対空機銃増備/電探";
+            case 48:
+                return "10cm連装高角砲改+高射装置改x2/対空電探";
         }
         return "不明(" + id + ")";
     }
@@ -252,7 +258,7 @@ public class AirBattleDto {
      */
     private static String[] getNumPlaneString(int[] stage, boolean detail) {
         if (stage == null) {
-            return new String[]{"", ""};
+            return new String[] { "", "" };
         }
         int flost = stage[0];
         int fall = stage[1];
@@ -261,12 +267,13 @@ public class AirBattleDto {
         int fremain = fall - flost;
         int eremain = eall - elost;
         if (detail) {
-            return new String[]{
+            return new String[] {
                     String.valueOf(fall) + "→" + fremain + " (-" + flost + ")",
                     String.valueOf(eall) + "→" + eremain + " (-" + elost + ")"
             };
-        } else {
-            return new String[]{
+        }
+        else {
+            return new String[] {
                     String.valueOf(fall) + "→" + fremain,
                     String.valueOf(eall) + "→" + eremain
             };
@@ -275,17 +282,19 @@ public class AirBattleDto {
 
     public static String[] toTouchPlaneString(int[] touchPlane) {
         if (touchPlane == null) {
-            return new String[]{"", ""};
+            return new String[] { "", "" };
         }
         String[] ret = new String[2];
         for (int i = 0; i < 2; ++i) {
             if (touchPlane[i] == -1) {
                 ret[i] = "なし";
-            } else {
+            }
+            else {
                 ItemInfoDto item = Item.get(touchPlane[i]);
                 if (item != null) {
                     ret[i] = item.getName();
-                } else {
+                }
+                else {
                     ret[i] = "あり（機体不明）";
                 }
             }

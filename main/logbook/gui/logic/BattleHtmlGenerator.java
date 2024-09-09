@@ -834,13 +834,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 4), textClass[0]);
                 }
                 else if ((i == 1) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！")
-                        || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！"))) {
+                        || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！") || HTypeS.equals("Richelieuよ！圧倒しなさいっ！"))) {
                     String tooltipText = this.getHpString(originHp[0], maxOriginHp[0]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 0), textClass[0]);
                 }
                 else if ((i == 2) && (HTypeS.equals("一斉射かッ…胸が熱いな！") || HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！")
-                        || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！"))) {
+                        || HTypeS.equals("第一戦隊、突撃！主砲、全力斉射ッ！") || HTypeS.equals("Richelieuよ！圧倒しなさいっ！"))) {
                     String tooltipText = this.getHpString(originHp[1], maxOriginHp[1]);
                     this.inline("td", text[0], null);
                     this.inline("td", "title='" + tooltipText + "'", this.getShipName(origin, 1), textClass[0]);

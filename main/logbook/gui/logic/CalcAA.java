@@ -1,12 +1,16 @@
 package logbook.gui.logic;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipParameters;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 対空関連を扱うクラス。
@@ -72,6 +76,8 @@ public class CalcAA {
             this.put(44, new AA_CI(6, 1.6));   // 10cm連装高角砲群 集中配備/機銃(対空6以上)/大和型電探(大和型改二)
             this.put(45, new AA_CI(5, 1.55));  // 10cm連装高角砲群 集中配備/大和型電探(大和型改二)
             this.put(46, new AA_CI(8, 1.55));  // 35.6cm連装砲改四/改三(ダズル迷彩仕様)/特殊機銃/対空電探(榛名改二乙)
+            this.put(47, new AA_CI(2, 1.3));   // 12.7cm連装砲C型改三H/25mm対空機銃増備/対空電探(白露型改二・対空70以上)
+            this.put(48, new AA_CI(8, 1.75));  // 10cm連装高角砲改+高射装置改x2/対空電探(秋月型改・改二)
         }
     };
 
@@ -83,8 +89,8 @@ public class CalcAA {
      * @return 最低保証数
      */
     public int getMinShotDown(boolean isFriend, int ciKind) {
-        if (ciKind > 0 && ciKind <= AA_CI_BONUS.size()) {
-            return AA_CI_BONUS.get(ciKind).getFixedBonus() + 1;
+        if ((ciKind > 0) && (ciKind <= this.AA_CI_BONUS.size())) {
+            return this.AA_CI_BONUS.get(ciKind).getFixedBonus() + 1;
         }
         return isFriend ? 1 : 0;
     }
@@ -117,7 +123,7 @@ public class CalcAA {
      */
     public <SHIP extends ShipBaseDto> int getFixedShotDown(SHIP ship, List<SHIP> ships, boolean isFriend, boolean isCombined, boolean isSecond, int formationKind, int ciKind, boolean isRaidBattle) {
         return (int) (this.getFinalWeightedAirValue(ship, ships, isFriend, formationKind)
-                * (ciKind > 0 && ciKind <= AA_CI_BONUS.size() ? AA_CI_BONUS.get(ciKind).getVariableBonus() : 1)
+                * ((ciKind > 0) && (ciKind <= this.AA_CI_BONUS.size()) ? this.AA_CI_BONUS.get(ciKind).getVariableBonus() : 1)
                 * this.getCombinedBonus(isFriend, isCombined, isSecond, isRaidBattle));
     }
 
@@ -182,7 +188,7 @@ public class CalcAA {
                 .map(ship -> this.getShipAllItems(ship, isFriend))
                 .mapToInt(items -> (int) this.getItemsFleetAirDefenseBonus(items))
                 .sum();
-        return (int) (this.getFormationBonus(formationKind) * fleetBonus / (isFriend ? 1.3 : 1.0));
+        return (int) ((this.getFormationBonus(formationKind) * fleetBonus) / (isFriend ? 1.3 : 1.0));
     }
 
     /**
@@ -312,7 +318,8 @@ public class CalcAA {
             case 11:    // 電探
                 return 0.4;
         }
-        if (item.getSlotitemId() == 9) return 0.25;  // 46cm三連装砲
+        if (item.getSlotitemId() == 9)
+            return 0.25; // 46cm三連装砲
         return 0.2;
     }
 

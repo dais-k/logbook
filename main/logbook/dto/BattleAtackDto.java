@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package logbook.dto;
 
@@ -590,6 +590,8 @@ public class BattleAtackDto {
             return "コロラド特殊攻撃";
         case 104:
             return "僚艦夜戦突撃";
+        case 105:
+            return "Richelieuよ！圧倒しなさいっ！";
         case 200:
             return "瑞雲立体攻撃";
         case 201:
@@ -650,6 +652,8 @@ public class BattleAtackDto {
             return "コロラド特殊攻撃";
         case 104:
             return "僚艦夜戦突撃";
+        case 105:
+            return "Richelieuよ！圧倒しなさいっ！";
         case 200:
             return "夜間瑞雲夜戦カットイン";
         case 201:
