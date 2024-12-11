@@ -434,6 +434,9 @@ public final class AppConfigBean {
     /** 獲得資源を表示するか */
     private boolean itemGetLog = false;
 
+    /** 装備一覧のフィルタ形式 0:アイコン 1:カテゴリ */
+    private int itemFilterMethod = 0;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -2410,4 +2413,19 @@ public final class AppConfigBean {
     public void setUsePortButton(boolean usePortButton) {
         this.usePortButton = usePortButton;
     }
+
+    /**
+     * @return itemFilterMethod
+     */
+    public int getItemFilterMethod() {
+        return this.itemFilterMethod;
+    }
+
+    /**
+     * @param itemFilterMethod セットする itemFilterMethod
+     */
+    public void setItemFilterMethod(int itemFilterMethod) {
+        this.itemFilterMethod = itemFilterMethod;
+    }
+
 }
