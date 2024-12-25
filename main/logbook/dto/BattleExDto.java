@@ -29,10 +29,6 @@ import logbook.internal.EnemyData;
 import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.dyuproject.protostuff.Tag;
-
 /**
  * １回の会敵情報
  * @author Nekopanda

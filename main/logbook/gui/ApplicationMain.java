@@ -1485,7 +1485,19 @@ public final class ApplicationMain extends WindowBase {
             }
         });
 
-       rootItemFormatter.setMenu(copyItemFormatterMenu);
+        final MenuItem copyItemFormatURL = new MenuItem(copyItemFormatterMenu, SWT.PUSH);
+        copyItemFormatURL.setText("サイトURLをクリップボードにコピー");
+
+        copyItemFormatURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { "https://noro6.github.io/kc-web/#/manager" },
+                        new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+
+        rootItemFormatter.setMenu(copyItemFormatterMenu);
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
