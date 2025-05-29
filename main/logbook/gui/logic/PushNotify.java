@@ -1,6 +1,6 @@
 package logbook.gui.logic;
 
-import static javax.json.stream.JsonParser.Event.VALUE_STRING;
+import static javax.json.stream.JsonParser.Event.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -19,14 +20,14 @@ import javax.json.stream.JsonParser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import logbook.config.AppConfig;
-import logbook.constants.AppConstants;
-import logbook.internal.LoggerHolder;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+
+import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
+import logbook.internal.LoggerHolder;
 
 /**
  * Push通知
@@ -42,7 +43,7 @@ public final class PushNotify {
 
     /**
      * 通知メッセージを処理待ちキューに入れます
-     * 
+     *
      * @param String メッセージ
      * @param Sgring イベント名
      * @param int    priority
@@ -53,7 +54,7 @@ public final class PushNotify {
 
     /**
      * 通知を実行します
-     * 
+     *
      * @param String 通知メッセージ
      */
     public static void push(String[] msg) {
@@ -78,7 +79,7 @@ public final class PushNotify {
 
     /**
      * Prowlによる通知
-     * 
+     *
      * @param String 通知メッセージ
      */
     private static void pushProwl(String[] msg) {
@@ -118,7 +119,7 @@ public final class PushNotify {
 
     /**
      * ImKayacによる通知
-     * 
+     *
      * @param String 通知メッセージ
      */
     private static void pushImKayac(String msg[]) {
@@ -137,7 +138,8 @@ public final class PushNotify {
                     String tmpStr = Integer.toHexString(digest[i] & 0xff);
                     if (tmpStr.length() == 1) {
                         buffer.append('0').append(tmpStr);
-                    } else {
+                    }
+                    else {
                         buffer.append(tmpStr);
                     }
                 }
@@ -146,7 +148,8 @@ public final class PushNotify {
                 addPOSTData(postdata, "message", msg[0]);
                 result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_IMKAYAC_URI + AppConfig.get().getImKayacUserName(),
                         postdata);
-            } else {
+            }
+            else {
                 addPOSTData(postdata, "message", msg[0]);
                 addPOSTData(postdata, "password", AppConfig.get().getImKayacPasswd());
                 result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_IMKAYAC_URI + AppConfig.get().getImKayacUserName(),
@@ -173,7 +176,7 @@ public final class PushNotify {
 
     /**
      * Pushoverによる通知
-     * 
+     *
      * @param String 通知メッセージ
      */
     private static void pushPushover(String msg[]) {
@@ -182,19 +185,19 @@ public final class PushNotify {
         String result = null;
 
         try {
-                addPOSTData(postdata, "token", AppConfig.get().getPushoverApitoken());
-                addPOSTData(postdata, "user", AppConfig.get().getPushoverUserKey());
-                addPOSTData(postdata, "message", msg[0]);
-                addPOSTData(postdata, "title", msg[1]);
-                addPOSTData(postdata, "priority", msg[2]);
-                if (msg[2].equals("2")) {
-                        addPOSTData(postdata, "expire", "1800");
-                        addPOSTData(postdata, "retry", "300");
-                }
+            addPOSTData(postdata, "token", AppConfig.get().getPushoverApitoken());
+            addPOSTData(postdata, "user", AppConfig.get().getPushoverUserKey());
+            addPOSTData(postdata, "message", msg[0]);
+            addPOSTData(postdata, "title", msg[1]);
+            addPOSTData(postdata, "priority", msg[2]);
+            if (msg[2].equals("2")) {
+                addPOSTData(postdata, "expire", "1800");
+                addPOSTData(postdata, "retry", "300");
+            }
 
-                result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PUSHOVER_URI ,
-                        postdata);
-            
+            result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PUSHOVER_URI,
+                    postdata);
+
             JsonParser parser = Json.createParser(new StringReader(result));
             boolean postflag = false;
             while (parser.hasNext()) {
@@ -216,18 +219,18 @@ public final class PushNotify {
 
     /**
      * LINE Notify APIによる通知
-     * 
+     *
      * @param String 通知メッセージ
      */
     private static void pushLINE(String msg[]) {
         StringBuilder postdata = new StringBuilder();
         String result = null;
         try {
-                String token = AppConfig.get().getLINEApitoken();
-                addPOSTData(postdata, "message", msg[1]+" "+msg[0]);
-                result = HttpPOSTRequestLINE(AppConstants.NOTIFY_LINE_URI ,
-                        postdata, token);
-            
+            String token = AppConfig.get().getLINEApitoken();
+            addPOSTData(postdata, "message", msg[1] + " " + msg[0]);
+            result = HttpPOSTRequestLINE(AppConstants.NOTIFY_LINE_URI,
+                    postdata, token);
+
             JsonParser parser = Json.createParser(new StringReader(result));
             boolean postflag = false;
             while (parser.hasNext()) {
@@ -248,17 +251,17 @@ public final class PushNotify {
 
     /**
      * HTTP POSTリクエストの送信
-     * 
+     *
      * @param String URL
      * @param StringBuilder POSTデータ
-     * 
+     *
      */
     private static String HttpPOSTRequest(String posturi, StringBuilder postsb) {
         HttpURLConnection connection = null;
         URL url = null;
         String postdata = postsb.toString();
         try {
-            url = new URL(posturi);
+            url = URI.create(posturi).toURL();
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
@@ -281,7 +284,8 @@ public final class PushNotify {
                 }
                 String resultStr = response.toString();
                 return resultStr;
-            } else {
+            }
+            else {
                 LOG.get().warn("Push 通知に失敗しました。HTTPレスポンスコード:" + connection.getResponseCode());
                 return "";
             }
@@ -294,25 +298,24 @@ public final class PushNotify {
 
     /**
      * HTTP POSTリクエストの送信(for LINE Notify API)
-     * 
+     *
      * @param String URL
      * @param StringBuilder POSTデータ
-     * 
+     *
      */
     private static String HttpPOSTRequestLINE(String posturi, StringBuilder postsb, String token) {
         HttpURLConnection connection = null;
         URL url = null;
-        String Auth_data = "Bearer"+" "+token;
+        String Auth_data = "Bearer" + " " + token;
         String postdata = postsb.toString();
         try {
-            url = new URL(posturi);
+            url = URI.create(posturi).toURL();
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setUseCaches(false);
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("Authorization", Auth_data);
-
 
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(postdata);
@@ -330,7 +333,8 @@ public final class PushNotify {
                 }
                 String resultStr = response.toString();
                 return resultStr;
-            } else {
+            }
+            else {
                 LOG.get().warn("LINE 通知に失敗しました。HTTPレスポンスコード:" + connection.getResponseCode());
                 return "";
             }
@@ -347,8 +351,7 @@ public final class PushNotify {
     * @param name Key name
     * @param value Value
     */
-    private static void addPOSTData(StringBuilder sb, String name, String value)
-    {
+    private static void addPOSTData(StringBuilder sb, String name, String value) {
         if (sb.length() > 0) {
             sb.append("&");
         }
@@ -363,7 +366,7 @@ public final class PushNotify {
 
     /**
      * Push通知用スレッド
-     * 
+     *
      */
     public static class PushNotifyThread extends Thread {
 

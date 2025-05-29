@@ -8,13 +8,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
@@ -28,6 +29,8 @@ import javax.json.JsonValue;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.eclipse.swt.widgets.Display;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -44,17 +47,15 @@ import logbook.gui.ApplicationMain;
 import logbook.gui.logic.SakutekiString;
 import logbook.internal.LoggerHolder;
 
-import org.eclipse.swt.widgets.Display;
-
 /**
  * TsunDB Client
- * 
+ *
  * 対応状況
  * ⭕:対応済み
  * 🔺:中途半端
  * ❌:未対応(やる気があれば対応できるかも)
  * ➖:対応予定なし
- * 
+ *
  * aaci:❌(対空CI用の手間がきつい)
  * abnormaldamage:❌(異常ダメ用の手間がきつい)
  * celldata:⭕
@@ -74,7 +75,7 @@ import org.eclipse.swt.widgets.Display;
  * shipdrop:⭕
  * shipdroplocations:⭕
  * spattack:➖
- * 
+ *
  * @author Nishikuma
  */
 public class TsunDBClient extends Thread {
@@ -142,8 +143,8 @@ public class TsunDBClient extends Thread {
         case COMBINED_BATTLE_RESULT:
             int shipCount = GlobalContext.getShipMap().size();
             int itemCount = GlobalContext.slotItemSize();
-            if (GlobalContext.maxChara() > shipCount &&
-                    GlobalContext.maxSlotitem() > itemCount) {
+            if ((GlobalContext.maxChara() > shipCount) &&
+                    (GlobalContext.maxSlotitem() > itemCount)) {
                 processDrop(data);
             }
             break;
@@ -167,7 +168,7 @@ public class TsunDBClient extends Thread {
         if (Objects.isNull(mapCellDto))
             return;
         int[] maps = mapCellDto.getMap();
-        int mapId = maps[0] * 10 + maps[1];
+        int mapId = (maps[0] * 10) + maps[1];
         String map = maps[0] + "-" + maps[1];
         int node = maps[2];
         String rank = lastBattleDto.getRank().rank();
@@ -204,13 +205,13 @@ public class TsunDBClient extends Thread {
                     .add("equipEscort", apiData.get("api_eSlot_combined"));
         }
         BattlePhaseKind kind = lastBattleDto.getPhase1().getKind();
-        if (kind == BattlePhaseKind.LD_AIRBATTLE || kind == BattlePhaseKind.COMBINED_LD_AIR) {
+        if ((kind == BattlePhaseKind.LD_AIRBATTLE) || (kind == BattlePhaseKind.COMBINED_LD_AIR)) {
             enemyComp.add("isAirRaid", true);
         }
         int hqLvl = lastBattleDto.getHqLv();
         int difficulty = mapHpInfo.getDifficulty();
         if (json.containsKey("api_get_eventitem")) {
-            processEventReward(map, difficulty, json.get("api_get_eventitem"));
+            processEventReward(map, difficulty, json.get("api_get_eventitem"), json.get("api_select_reward_dict"));
         }
         int ship = lastBattleDto.isDropShip() ? lastBattleDto.getDropShipId() : -1;
         JsonObjectBuilder counts = Json.createObjectBuilder();
@@ -253,7 +254,7 @@ public class TsunDBClient extends Thread {
         JsonObject json = data.getJsonObject().getJsonObject("api_data");
         int hqLvl = GlobalContext.hqLevel();
         ShipDto secretary = GlobalContext.getSecretary();
-        if (!(hqLvl > 0 && Objects.nonNull(secretary)))
+        if (!((hqLvl > 0) && Objects.nonNull(secretary)))
             return;
         json.getJsonArray("api_get_items").forEach(e -> {
             int slotitemId = Json.createObjectBuilder().add("e", e).build().getJsonObject("e")
@@ -276,11 +277,12 @@ public class TsunDBClient extends Thread {
         });
     }
 
-    private static void processEventReward(String map, int difficulty, JsonValue rewards) {
+    private static void processEventReward(String map, int difficulty, JsonValue rewards, JsonValue selectreward) {
         String result = Json.createObjectBuilder()
                 .add("map", map)
                 .add("difficulty", difficulty)
                 .add("rewards", rewards)
+                .add("selectreward", selectreward)
                 .build()
                 .toString();
         getInstance().dataQueue.offer(new QueueItem("eventreward", result));
@@ -336,7 +338,7 @@ public class TsunDBClient extends Thread {
         }
         boolean[] sortie = GlobalContext.getIsSortie();
         int sortiedFleet;
-        for (sortiedFleet = 0; sortiedFleet < sortie.length && !sortie[sortiedFleet]; sortiedFleet++)
+        for (sortiedFleet = 0; (sortiedFleet < sortie.length) && !sortie[sortiedFleet]; sortiedFleet++)
             ;
         int[] map = sortieMap.getMap();
         JsonObjectBuilder job = Json.createObjectBuilder()
@@ -389,7 +391,7 @@ public class TsunDBClient extends Thread {
         job.add("fleetoneequips", toJsonArray(fleetoneequips.stream().mapToInt(i -> i).toArray()))
                 .add("fleetoneexslots", toJsonArray(fleetoneexslots.stream().mapToInt(i -> i).toArray()))
                 .add("fleetonetypes", toJsonArray(fleetonetypes.stream().mapToInt(i -> i).toArray()));
-        if (GlobalContext.isCombined() && sortiedFleet == 0) {
+        if (GlobalContext.isCombined() && (sortiedFleet == 0)) {
             DockDto dock2 = GlobalContext.getDock(String.valueOf(2));
             List<ShipDto> s2 = dock2.getShips();
             boolean[] escaped2 = dock2.getEscaped();
@@ -526,7 +528,7 @@ public class TsunDBClient extends Thread {
                 .build();
         boolean[] sortie = GlobalContext.getIsSortie();
         int sortiedFleet;
-        for (sortiedFleet = 0; sortiedFleet < sortie.length && !sortie[sortiedFleet]; sortiedFleet++)
+        for (sortiedFleet = 0; (sortiedFleet < sortie.length) && !sortie[sortiedFleet]; sortiedFleet++)
             ;
         DockDto dock = GlobalContext.getDock(String.valueOf(sortiedFleet + 1));
         List<ShipDto> ships = dock.getShips();
@@ -538,7 +540,7 @@ public class TsunDBClient extends Thread {
                 fleet1.add(ships.get(i).getCharId());
             }
         }
-        if (GlobalContext.isCombined() && sortiedFleet == 0) {
+        if (GlobalContext.isCombined() && (sortiedFleet == 0)) {
             DockDto dock2 = GlobalContext.getDock(String.valueOf(2));
             List<ShipDto> ships2 = dock2.getShips();
             boolean[] escaped2 = dock2.getEscaped();
@@ -648,7 +650,7 @@ public class TsunDBClient extends Thread {
 
     private int post(String target, String data) {
         try {
-            URL url = new URL("https://tsundb.kc3.moe/api/" + target);
+            URL url = URI.create("https://tsundb.kc3.moe/api/" + target).toURL();
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("PUT");
             con.setDoOutput(true);
@@ -690,7 +692,7 @@ public class TsunDBClient extends Thread {
                 for (int retly = 0;; ++retly) {
                     boolean error = false;
                     try {
-                        int code = post(target, data);
+                        int code = this.post(target, data);
                         if (this.endRequested)
                             return;
                         if (code == HttpURLConnection.HTTP_OK) {
