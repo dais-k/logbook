@@ -69,14 +69,18 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
             HttpContent content = (HttpContent) httpObject;
             ByteBuf buf = content.content();
             ByteBuf copied = buf.copy();
-            byte[] bytes = new byte[copied.readableBytes()];
-            copied.readBytes(bytes);
-            this.requestBodyBuffer.write(bytes, 0, bytes.length);
+            try {
+                byte[] bytes = new byte[copied.readableBytes()];
+                copied.readBytes(bytes);
+                this.requestBodyBuffer.write(bytes, 0, bytes.length);
+            } finally {
+                copied.release();
+            }
         }
-
+    
         return null;
     }
-
+    
     @Override
     public HttpObject proxyToClientResponse(HttpObject httpObject) {
         if (httpObject instanceof HttpResponse) {
@@ -86,21 +90,26 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
             HttpContent content = (HttpContent) httpObject;
             ByteBuf buf = content.content();
             ByteBuf copied = buf.copy();
-            byte[] bytes = new byte[copied.readableBytes()];
-            copied.readBytes(bytes);
-            this.responseBodyBuffer.write(bytes, 0, bytes.length);
-
-            if (httpObject instanceof LastHttpContent) {
-                try {
-                    this.onResponseSuccess();
-                } catch (URISyntaxException e) {
-                    LOG.get().warn("受信データ処理に失敗", e);
+            try {
+                byte[] bytes = new byte[copied.readableBytes()];
+                copied.readBytes(bytes);
+                this.responseBodyBuffer.write(bytes, 0, bytes.length);
+    
+                if (httpObject instanceof LastHttpContent) {
+                    try {
+                        this.onResponseSuccess();
+                    } catch (URISyntaxException e) {
+                        LOG.get().warn("受信データ処理に失敗", e);
+                    }
                 }
+            } finally {
+                copied.release();
             }
         }
-
+    
         return httpObject;
     }
+    
 
     private void onResponseSuccess() throws URISyntaxException {
         if (Filter.isNeed(this.request.headers().get(HttpHeaderNames.HOST),

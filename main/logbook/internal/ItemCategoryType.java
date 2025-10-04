@@ -72,6 +72,7 @@ public class ItemCategoryType {
             this.put(57, "噴式戦闘爆撃機");
             this.put(58, "噴式攻撃機");
             this.put(59, "噴式偵察機");
+            //this.put(91, "噴式戦闘爆撃機(II)");
             //this.put(93, "大型電探(II)");
             //this.put(94, "艦上偵察機(II)");
             //this.put(95, "副砲(II)");
