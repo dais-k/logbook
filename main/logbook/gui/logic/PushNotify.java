@@ -20,14 +20,14 @@ import javax.json.stream.JsonParser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
+import logbook.internal.LoggerHolder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-
-import logbook.config.AppConfig;
-import logbook.constants.AppConstants;
-import logbook.internal.LoggerHolder;
 
 /**
  * Push通知
@@ -185,19 +185,19 @@ public final class PushNotify {
         String result = null;
 
         try {
-            addPOSTData(postdata, "token", AppConfig.get().getPushoverApitoken());
-            addPOSTData(postdata, "user", AppConfig.get().getPushoverUserKey());
-            addPOSTData(postdata, "message", msg[0]);
-            addPOSTData(postdata, "title", msg[1]);
-            addPOSTData(postdata, "priority", msg[2]);
-            if (msg[2].equals("2")) {
-                addPOSTData(postdata, "expire", "1800");
-                addPOSTData(postdata, "retry", "300");
-            }
+                addPOSTData(postdata, "token", AppConfig.get().getPushoverApitoken());
+                addPOSTData(postdata, "user", AppConfig.get().getPushoverUserKey());
+                addPOSTData(postdata, "message", msg[0]);
+                addPOSTData(postdata, "title", msg[1]);
+                addPOSTData(postdata, "priority", msg[2]);
+                if (msg[2].equals("2")) {
+                        addPOSTData(postdata, "expire", "1800");
+                        addPOSTData(postdata, "retry", "300");
+                }
 
-            result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PUSHOVER_URI,
-                    postdata);
-
+                result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PUSHOVER_URI ,
+                        postdata);
+            
             JsonParser parser = Json.createParser(new StringReader(result));
             boolean postflag = false;
             while (parser.hasNext()) {
@@ -226,11 +226,11 @@ public final class PushNotify {
         StringBuilder postdata = new StringBuilder();
         String result = null;
         try {
-            String token = AppConfig.get().getLINEApitoken();
-            addPOSTData(postdata, "message", msg[1] + " " + msg[0]);
-            result = HttpPOSTRequestLINE(AppConstants.NOTIFY_LINE_URI,
-                    postdata, token);
-
+                String token = AppConfig.get().getLINEApitoken();
+                addPOSTData(postdata, "message", msg[1]+" "+msg[0]);
+                result = HttpPOSTRequestLINE(AppConstants.NOTIFY_LINE_URI ,
+                        postdata, token);
+            
             JsonParser parser = Json.createParser(new StringReader(result));
             boolean postflag = false;
             while (parser.hasNext()) {

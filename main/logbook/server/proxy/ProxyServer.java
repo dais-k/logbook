@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.util.Queue;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.gui.ApplicationMain;
 import logbook.internal.LoggerHolder;
 import net.lightbody.bmp.mitm.KeyStoreFileCertificateSource;
@@ -15,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
-
 import org.littleshoot.proxy.ChainedProxy;
 import org.littleshoot.proxy.ChainedProxyAdapter;
 import org.littleshoot.proxy.ChainedProxyManager;
@@ -49,9 +49,9 @@ public final class ProxyServer {
             MitmManager mitmManager = ImpersonatingMitmManager.builder()
                     .rootCertificateSource(new KeyStoreFileCertificateSource(
                             "PKCS12",
-                            new File("config/logbook-keystore.p12"),
+                            AppConstants.PKCS12_FILE,
                             "logbook",
-                            "logbook"))
+                            "changeit"))
                     .build();
             updateSetting();
 

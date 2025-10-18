@@ -10,16 +10,16 @@ public class SquadronDto extends ItemDto {
 
     @Tag(101)
     private int squadronId;
-    
+
     @Tag(102)
     private int state;
-    
+
     @Tag(103)
     private int count;
-    
+
     @Tag(104)
     private int maxCount;
-    
+
     @Tag(105)
     private int cond;
 
@@ -29,9 +29,17 @@ public class SquadronDto extends ItemDto {
             super.setLocked(item.isLocked());
             super.setLevel(item.getLevel());
             super.setAlv(item.getAlv());
-            this.count = json.getInt("api_count");
-            this.maxCount = json.getInt("api_max_count");
-            this.cond = json.getInt("api_cond");
+            this.count = (json.containsKey("api_count") && !json.isNull("api_count"))
+                    ? json.getInt("api_count")
+                    : item instanceof SquadronDto ? ((SquadronDto) item).getCount() : 0;
+
+            this.maxCount = (json.containsKey("api_max_count") && !json.isNull("api_max_count"))
+                    ? json.getInt("api_max_count")
+                    : item instanceof SquadronDto ? ((SquadronDto) item).getMaxCount() : 0;
+
+            this.cond = (json.containsKey("api_cond") && !json.isNull("api_cond"))
+                    ? json.getInt("api_cond")
+                    : item instanceof SquadronDto ? ((SquadronDto) item).getCond() : 0;
         }
         this.squadronId = json.getInt("api_squadron_id");
         this.state = json.getInt("api_state");
@@ -52,7 +60,7 @@ public class SquadronDto extends ItemDto {
     }
 
     public int getSquadronId() {
-        return squadronId;
+        return this.squadronId;
     }
 
     public void setSquadronId(int squadronId) {
@@ -60,7 +68,7 @@ public class SquadronDto extends ItemDto {
     }
 
     public int getState() {
-        return state;
+        return this.state;
     }
 
     public void setState(int state) {
@@ -68,7 +76,7 @@ public class SquadronDto extends ItemDto {
     }
 
     public int getCount() {
-        return count;
+        return this.count;
     }
 
     public void setCount(int count) {
@@ -76,7 +84,7 @@ public class SquadronDto extends ItemDto {
     }
 
     public int getMaxCount() {
-        return maxCount;
+        return this.maxCount;
     }
 
     public void setMaxCount(int maxCount) {
@@ -84,7 +92,7 @@ public class SquadronDto extends ItemDto {
     }
 
     public int getCond() {
-        return cond;
+        return this.cond;
     }
 
     public void setCond(int cond) {
