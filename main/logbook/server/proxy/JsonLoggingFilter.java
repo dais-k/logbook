@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
+import logbook.config.AppConfig;
 import logbook.data.Data;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
@@ -32,12 +33,12 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
 
     private static final LoggerHolder LOG = new LoggerHolder(JsonLoggingFilter.class);
 
-    private ByteArrayOutputStream requestBodyBuffer;
-    private ByteArrayOutputStream responseBodyBuffer;
+    private final ByteArrayOutputStream requestBodyBuffer;
+    private final ByteArrayOutputStream responseBodyBuffer;
     private HttpRequest request;
     private HttpResponse response;
     private boolean isHttps;
-    private boolean isLoopback;
+    private final boolean isLoopback;
 
     public JsonLoggingFilter(HttpRequest originalRequest, ChannelHandlerContext ctx) {
         super(originalRequest, ctx);
@@ -45,21 +46,23 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
         this.responseBodyBuffer = new ByteArrayOutputStream();
         InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         String ip = remoteAddress.getAddress().getHostAddress();
-        isLoopback = ip.equals("127.0.0.1") || ip.equals("::1") || ip.equals("0:0:0:0:0:0:0:1");
+        this.isLoopback = ip.equals("127.0.0.1") || ip.equals("::1") || ip.equals("0:0:0:0:0:0:0:1");
     }
 
     @Override
     public HttpResponse clientToProxyRequest(HttpObject httpObject) {
-        if (!isLoopback) {
-            // リモートホストがローカルループバックアドレス以外の場合400を返し通信しない
-            String message = "400 Bad Request - Access denied";
-            DefaultFullHttpResponse response = new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.BAD_REQUEST,
-                    Unpooled.wrappedBuffer(message.getBytes(StandardCharsets.UTF_8)));
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, message.length());
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-            return response;
+        if (AppConfig.get().isAllowOnlyFromLocalhost() && !AppConfig.get().isCloseOutsidePort()) {
+            if (!this.isLoopback) {
+                // リモートホストがローカルループバックアドレス以外の場合400を返し通信しない
+                String message = "400 Bad Request - Access denied";
+                DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                        HttpVersion.HTTP_1_1,
+                        HttpResponseStatus.BAD_REQUEST,
+                        Unpooled.wrappedBuffer(message.getBytes(StandardCharsets.UTF_8)));
+                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, message.length());
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+                return response;
+            }
         }
         if (httpObject instanceof HttpRequest) {
             this.request = (HttpRequest) httpObject;
@@ -77,10 +80,10 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
                 copied.release();
             }
         }
-    
+
         return null;
     }
-    
+
     @Override
     public HttpObject proxyToClientResponse(HttpObject httpObject) {
         if (httpObject instanceof HttpResponse) {
@@ -94,7 +97,7 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
                 byte[] bytes = new byte[copied.readableBytes()];
                 copied.readBytes(bytes);
                 this.responseBodyBuffer.write(bytes, 0, bytes.length);
-    
+
                 if (httpObject instanceof LastHttpContent) {
                     try {
                         this.onResponseSuccess();
@@ -106,10 +109,9 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
                 copied.release();
             }
         }
-    
+
         return httpObject;
     }
-    
 
     private void onResponseSuccess() throws URISyntaxException {
         if (Filter.isNeed(this.request.headers().get(HttpHeaderNames.HOST),

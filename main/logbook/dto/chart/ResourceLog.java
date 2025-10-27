@@ -46,7 +46,7 @@ public class ResourceLog extends AbstractDto {
 
     /**
      * 資材ログを読み込む
-     * 
+     *
      * @param file 資材ログ
      * @return
      * @throws IOException
@@ -94,8 +94,7 @@ public class ResourceLog extends AbstractDto {
 
                     int baseIdx;
                     // 拡張版の方は１列追加してしまったので、両方に対応させる！
-                    // TODO: isCreatable()を使うとjava.lang.NoSuchMethodErrorになってしまう
-                    if (NumberUtils.isNumber(colums[1])) {
+                    if (NumberUtils.isParsable(colums[1])) {
                         // 本家のログ
                         baseIdx = 1;
                     }
@@ -188,6 +187,21 @@ public class ResourceLog extends AbstractDto {
         @Override
         public int compareTo(SortableLog o) {
             return Long.compare(this.time, o.time);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if ((obj == null) || (this.getClass() != obj.getClass()))
+                return false;
+            SortableLog that = (SortableLog) obj;
+            return this.time == that.time;
+        }
+
+        @Override
+        public int hashCode() {
+            return Long.hashCode(this.time);
         }
     }
 }

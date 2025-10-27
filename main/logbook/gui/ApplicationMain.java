@@ -12,9 +12,53 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tray;
+import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
@@ -22,7 +66,13 @@ import logbook.config.UserDataConfig;
 import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
-import logbook.dto.*;
+import logbook.dto.AirPower;
+import logbook.dto.AirbaseDto;
+import logbook.dto.BattleExDto;
+import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserDetailDto;
+import logbook.dto.SquadronDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
@@ -39,10 +89,15 @@ import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
-import logbook.internal.*;
+import logbook.internal.BattleResultServer;
+import logbook.internal.EnemyData;
 import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
+import logbook.internal.ResultRecord;
+import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord;
 import logbook.scripting.ScriptData;
-import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.server.proxy.TsunDBClient;
 import logbook.thread.ThreadManager;
@@ -50,23 +105,6 @@ import logbook.thread.ThreadStateObserver;
 import logbook.util.CAKeyStore;
 import logbook.util.JIntellitypeWrapper;
 import logbook.util.SwtUtils;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * メイン画面
@@ -80,7 +118,8 @@ public final class ApplicationMain extends WindowBase {
     private static final LoggerHolder LOG = new LoggerHolder(ApplicationMain.class);
 
     private static final int MAX_LOG_LINES = 200;
-    private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
+    private static final ThreadLocal<DateFormat> LOG_DATE_FORMAT = ThreadLocal
+            .withInitial(() -> new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT));
 
     private static final LoggerHolder userLogger = new LoggerHolder("user");
 
@@ -356,6 +395,7 @@ public final class ApplicationMain extends WindowBase {
             // 設定読み込み
             AppConfig.load();
             CAKeyStore.genrateIfNeeded();
+            CAKeyStore.installCertificateIfNeeded();
             /*　static initializer に移行
             ShipConfig.load();
             MasterDataConfig.load();
@@ -1805,7 +1845,6 @@ public final class ApplicationMain extends WindowBase {
         SWTResourceManager.dispose();
         // プロキシサーバーをシャットダウンする
         ProxyServer.end();
-        DatabaseClient.end();
         TsunDBClient.end();
         // ホットキーを解除
         JIntellitypeWrapper.cleanup();
@@ -2257,7 +2296,7 @@ public final class ApplicationMain extends WindowBase {
         if (size >= MAX_LOG_LINES) {
             this.console.remove(0);
         }
-        this.console.add(LOG_DATE_FORMAT.format(new Date()) + "  " + message);
+        this.console.add(LOG_DATE_FORMAT.get().format(new Date()) + "  " + message);
         this.console.setSelection(this.console.getItemCount() - 1);
     }
 
@@ -2368,7 +2407,7 @@ public final class ApplicationMain extends WindowBase {
         airbaseMap.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey())).forEach(e -> {
             int areaId = e.getKey();
             List<AirbaseDto> airbases = e.getValue().stream()
-                    .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid()))
+                    .sorted(Comparator.comparing(airbase -> airbase.getRid()))
                     .collect(Collectors.toList());
 
             if (isMinimumLayout) {
@@ -2399,7 +2438,7 @@ public final class ApplicationMain extends WindowBase {
             }
         });
         if (airbaseMap.size() > 0) {
-            this.airbaseCombo.select(select < 0 && select < airbaseMap.size() ? 0 : select);
+            this.airbaseCombo.select((select < 0) && (select < airbaseMap.size()) ? 0 : select);
         }
         else {
             this.airbaseCombo.add("基地航空隊");
@@ -2424,13 +2463,13 @@ public final class ApplicationMain extends WindowBase {
                 + "\r\n";
 
         List<AirbaseDto> airbases = areaAirbases.stream()
-                .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid())).collect(Collectors.toList());
+                .sorted(Comparator.comparing(airbase -> airbase.getRid())).collect(Collectors.toList());
         for (AirbaseDto airbase : airbases) {
             result += "#" + airbase.getAreaId() + "-" + airbase.getRid() + " " + "[" + airbase.toActionKindString()
                     + "]" + airbase.getName()
                     + "\r\n";
             List<SquadronDto> planeInfos = airbase.getPlaneInfos().stream()
-                    .sorted(Comparator.comparing(planeInfo -> ((SquadronDto) planeInfo).getSquadronId()))
+                    .sorted(Comparator.comparing(planeInfo -> planeInfo.getSquadronId()))
                     .collect(Collectors.toList());
             AirPower airPower = new AirPower(0);
             switch (airbase.getActionKind()) {

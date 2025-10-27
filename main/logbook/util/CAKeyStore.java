@@ -1,6 +1,5 @@
 package logbook.util;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,8 +17,15 @@ import java.util.Base64;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
@@ -30,9 +36,9 @@ import logbook.constants.AppConstants;
 
 public class CAKeyStore {
     public static void genrateIfNeeded() throws NoSuchAlgorithmException, OperatorCreationException,
-            CertificateException, KeyStoreException, FileNotFoundException, IOException {
+            CertificateException, KeyStoreException, IOException {
         if (AppConstants.PKCS12_FILE.exists()) {
-            System.out.println("PKCS12ファイルが存在しているため作成スキップ");
+            System.out.println("PKCS12ファイルが存在しているため作成スキップします。");
             return;
         }
 
@@ -43,12 +49,13 @@ public class CAKeyStore {
         keyGen.initialize(2048);
         KeyPair keyPair = keyGen.generateKeyPair();
 
-        // 2. 自己署名 X.509 証明書作成（100年有効）
-        X500Name owner = new X500Name("CN=LogbookCA, OU=MITM, O=MyOrg, L=Tokyo, ST=Tokyo, C=JP");
+        // 2. 自己署名 X.509 証明書作成（10年有効）
+        X500Name owner = new X500Name("CN=" + AppConstants.CN_ALIAS);
         BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
         Date notBefore = new Date();
-        Date notAfter = new Date(notBefore.getTime() + 36500L * 24 * 60 * 60 * 1000); // 100年
+        Date notAfter = new Date(notBefore.getTime() + 3650L * 24 * 60 * 60 * 1000); // 10年
 
+        // 3. 証明書ビルダー
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 owner,
                 serial,
@@ -57,6 +64,37 @@ public class CAKeyStore {
                 owner,
                 keyPair.getPublic());
 
+        // 4. Basic Constraints（CA=TRUE, パス長制約なし）
+        certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+
+        // 5. KeyUsage（KancolleSnifferは指定していなかったので合わせてみる）
+        //    CA認証だとKeyUsage.keyCertSign | KeyUsage.cRLSign
+        //    サーバ認証だとKeyUsage.digitalSignature | KeyUsage.keyEncipherment
+        // certBuilder.addExtension(Extension.keyUsage, true,
+        //         new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign));
+
+        // 6. EnhancedKeyUsage（サーバ認証）
+        //    CA認証なので本来必要ないはずだがKancolleSnifferに合わせてみる
+        certBuilder.addExtension(Extension.extendedKeyUsage, false,
+                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
+
+        // 7. SAN（Subject Alternative Name）
+        //    CA認証なので本来必要ないはずだがKancolleSnifferに合わせてみる
+        GeneralName[] names = new GeneralName[AppConstants.KANCOLLE_DOMAIN_LIST.length];
+        for (int i = 0; i < AppConstants.KANCOLLE_DOMAIN_LIST.length; i++) {
+            names[i] = new GeneralName(GeneralName.dNSName, AppConstants.KANCOLLE_DOMAIN_LIST[i]);
+        }
+
+        certBuilder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(names));
+
+        // 8. SKI/AKI（識別子）
+        JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+        certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+                extUtils.createSubjectKeyIdentifier(keyPair.getPublic()));
+        certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
+                extUtils.createAuthorityKeyIdentifier(keyPair.getPublic()));
+
+        // 9. 署名
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
                 .setProvider("BC")
                 .build(keyPair.getPrivate());
@@ -65,18 +103,18 @@ public class CAKeyStore {
                 .setProvider("BC")
                 .getCertificate(certBuilder.build(signer));
 
-        // 3. PKCS12 キーストアに格納
+        // 10. PKCS12 キーストアに格納
         KeyStore ks = KeyStore.getInstance("PKCS12");
         ks.load(null, null);
         ks.setKeyEntry("logbook", keyPair.getPrivate(), AppConstants.PKCS12_PASSWORD.toCharArray(),
                 new X509Certificate[] { cert });
 
-        // 4. ファイル出力
+        // 11. ファイル出力
         try (FileOutputStream fos = new FileOutputStream(AppConstants.PKCS12_FILE)) {
             ks.store(fos, AppConstants.PKCS12_PASSWORD.toCharArray());
         }
 
-        // 5. PEM 形式で秘密鍵・証明書も出力
+        // 12. PEM 形式で秘密鍵・証明書も出力
         // 秘密鍵 PEM
         try (Writer out = new FileWriter(AppConstants.KEY_FILE)) {
             out.write("-----BEGIN PRIVATE KEY-----\n");
@@ -90,5 +128,177 @@ public class CAKeyStore {
             out.write(Base64.getMimeEncoder(64, "\n".getBytes()).encodeToString(cert.getEncoded()));
             out.write("\n-----END CERTIFICATE-----\n");
         }
+    }
+
+    public static void installCertificateIfNeeded() throws InterruptedException, IOException, NoSuchAlgorithmException,
+            CertificateException, KeyStoreException {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (!AppConstants.CRT_FILE.exists()) {
+            System.out.println("CRTファイルが存在していないためインストールスキップします。");
+            return;
+        }
+        if (!AppConstants.PKCS12_FILE.exists()) {
+            System.out.println("PKCS12ファイルが存在していないためインストールスキップします。");
+            return;
+        }
+
+        if (os.contains("win")) {
+            installToWindows();
+        }
+        else if (os.contains("linux")) {
+            installToLinux();
+        }
+        else if (os.contains("mac")) {
+            installToMac();
+        }
+    }
+
+    private static boolean existsTrustedRootCertificationAuthorities() throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder(
+                "powershell.exe",
+                "-Command",
+                "if (Get-ChildItem -Path Cert:\\CurrentUser\\Root | Where-Object { $_.Subject -like '*"
+                        + AppConstants.CN_ALIAS + "*' }) { exit 0 } else { exit 1 }");
+        return pb.start().waitFor() == 0;
+    }
+
+    /**
+     * Windows のユーザー信頼ストアにインポート
+     * @throws InterruptedException 
+     * @throws IOException 
+     */
+    private static int installToWindows() throws InterruptedException, IOException {
+        // Windows 7だとPowershell実行で止まるらしい
+        if (!isWindows10OrLater()) {
+            System.out.println("Windows 10未満なためインストールをスキップします。");
+            return 0;
+        }
+
+        // powershellが使えない場合も飛ばす
+        if (!isPowerShellAvailable()) {
+            System.out.println("powershell が使えないためインストールをスキップします。");
+            return 0;
+        }
+
+        if (existsTrustedRootCertificationAuthorities()) {
+            System.out.println("証明書は Windows の信頼されたルート証明機関に登録されているためスキップします。");
+            return 0;
+        }
+        else {
+            System.out.println("証明書はまだ登録されていません。");
+        }
+
+        ProcessBuilder pb = new ProcessBuilder(
+                "powershell.exe",
+                "-Command",
+                "Import-PfxCertificate -FilePath \"" + AppConstants.PKCS12_FILE
+                        + "\" -Password (ConvertTo-SecureString -String \"" + AppConstants.PKCS12_PASSWORD
+                        + "\" -AsPlainText -Force)"
+                        + " -CertStoreLocation \"Cert:\\CurrentUser\\Root\"");
+        return pb.inheritIO().start().waitFor();
+    }
+
+    public static boolean isPowerShellAvailable() throws InterruptedException, IOException {
+        ProcessBuilder pb = new ProcessBuilder("where", "powershell.exe");
+        return pb.inheritIO().start().waitFor() == 0;
+    }
+
+    private static boolean isWindows10OrLater() {
+        String osName = System.getProperty("os.name").toLowerCase();
+        String osVersion = System.getProperty("os.version");
+
+        if (!osName.contains("windows")) {
+            return false;
+        }
+
+        try {
+            double version = Double.parseDouble(osVersion);
+            return version >= 10.0;
+        } catch (NumberFormatException e) {
+            // Windows 11などで "10.0" としか返らない場合があるため
+            return osName.contains("windows 10") || osName.contains("windows 11");
+        }
+    }
+
+    private static boolean existsSystemTrustedRootCertificate() throws IOException, InterruptedException {
+        String os = System.getProperty("os.name").toLowerCase();
+        String command;
+
+        if (os.contains("mac")) {
+            command = "security find-certificate -a -c \"" + AppConstants.CN_ALIAS
+                    + "\" /Library/Keychains/System.keychain >/dev/null 2>&1";
+        }
+        else {
+            command = "openssl verify -CApath /etc/ssl/certs <(openssl x509 -in " + AppConstants.CRT_FILE.getName()
+                    + ") >/dev/null 2>&1";
+        }
+
+        ProcessBuilder pb = new ProcessBuilder("bash", "-c", command);
+        return pb.start().waitFor() == 0;
+    }
+
+    /**
+     * Linux のシステムCAストアにインポート
+     * @throws IOException 
+     * @throws InterruptedException 
+     */
+    private static int installToLinux() throws IOException, InterruptedException {
+        if (existsSystemTrustedRootCertificate()) {
+            System.out.println("証明書は Linux のシステムCAに登録されているためスキップします。");
+            return 0;
+        }
+        else {
+            System.out.println("証明書はまだ登録されていません。");
+        }
+
+        ProcessBuilder checkPb = new ProcessBuilder("bash", "-c", "command -v pkexec");
+        if (checkPb.start().waitFor() != 0) {
+            // pkexec が存在しない場合はスキップ
+            System.out.println("pkexec が見つかりません。システムCAへの登録をスキップします。");
+            return 0;
+        }
+
+        String command = "pkexec bash -c 'cp " + AppConstants.CRT_FILE
+                + " /usr/local/share/ca-certificates/ && update-ca-certificates'";
+        return new ProcessBuilder("bash", "-c", command).inheritIO().start().waitFor();
+    }
+
+    /**
+     * Mac のシステムCAストアにインポート
+     * @return
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    private static int installToMac() throws InterruptedException, IOException {
+        if (existsSystemTrustedRootCertificate()) {
+            System.out.println("証明書は Mac のシステムCAに登録されているためスキップします。");
+            return 0;
+        }
+        else {
+            System.out.println("証明書はまだ登録されていません。");
+        }
+
+        int result = 0;
+
+        // (1) .p12 をキーチェーンにインポート
+        String importCommand = String.format(
+                "osascript -e 'do shell script \"security import %s -k /Library/Keychains/System.keychain -P %s -A\" with administrator privileges'",
+                AppConstants.PKCS12_FILE,
+                "your_password");
+        result += new ProcessBuilder("bash", "-c", importCommand)
+                .inheritIO()
+                .start()
+                .waitFor();
+
+        // (2) ルート証明書として信頼設定（CRTファイルを併用）
+        String trustCommand = String.format(
+                "osascript -e 'do shell script \"security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain %s\" with administrator privileges'",
+                AppConstants.CRT_FILE);
+        result += new ProcessBuilder("bash", "-c", trustCommand)
+                .inheritIO()
+                .start()
+                .waitFor();
+
+        return result;
     }
 }

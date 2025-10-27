@@ -1,6 +1,5 @@
 package logbook.server.proxy;
 
-import java.io.File;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.util.Queue;
@@ -43,6 +42,7 @@ public final class ProxyServer {
     private static int port;
     private static String proxyHost;
     private static int proxyPort;
+    private static boolean isTrustAllServers;
 
     public static void start() {
         try {
@@ -51,7 +51,8 @@ public final class ProxyServer {
                             "PKCS12",
                             AppConstants.PKCS12_FILE,
                             "logbook",
-                            "changeit"))
+                            AppConstants.PKCS12_PASSWORD))
+                    .trustAllServers(isTrustAllServers)
                     .build();
             updateSetting();
 
@@ -139,8 +140,11 @@ public final class ProxyServer {
             newProxyPort = AppConfig.get().getProxyPort();
         }
 
+        boolean isNewTrustAllServers = AppConfig.get().isTrustAllServers(); 
+
         if (StringUtils.equals(newHost, host) && (newPort == port) &&
-                StringUtils.equals(newProxyHost, proxyHost) && (newProxyPort == proxyPort)) {
+                StringUtils.equals(newProxyHost, proxyHost) && (newProxyPort == proxyPort) &&
+                isTrustAllServers == isNewTrustAllServers) {
             return false;
         }
 
@@ -148,6 +152,7 @@ public final class ProxyServer {
         port = newPort;
         proxyHost = newProxyHost;
         proxyPort = newProxyPort;
+        isTrustAllServers = isNewTrustAllServers;
         return true;
     }
 
