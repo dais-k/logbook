@@ -2789,7 +2789,7 @@ public final class GlobalContext {
                     if (AppConfig.get().isUseAlphabetizeMap() && Objects.nonNull(map)) {
                         String s = Arrays.stream(strikePoint.split(",")).map((point) -> {
                             String[] mapEdge = MapEdges.get(new int[] { map[0], map[1], Integer.parseInt(point) });
-                            if (Objects.nonNull(mapEdge) && (mapEdge.length > 1)) {
+                            if (Objects.nonNull(mapEdge) && mapEdge.length > 1) {
                                 return mapEdge[1] + "(" + point + ")";
                             }
                             return point;

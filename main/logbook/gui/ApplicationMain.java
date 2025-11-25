@@ -2407,7 +2407,7 @@ public final class ApplicationMain extends WindowBase {
         airbaseMap.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey())).forEach(e -> {
             int areaId = e.getKey();
             List<AirbaseDto> airbases = e.getValue().stream()
-                    .sorted(Comparator.comparing(airbase -> airbase.getRid()))
+                    .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid()))
                     .collect(Collectors.toList());
 
             if (isMinimumLayout) {
@@ -2463,13 +2463,13 @@ public final class ApplicationMain extends WindowBase {
                 + "\r\n";
 
         List<AirbaseDto> airbases = areaAirbases.stream()
-                .sorted(Comparator.comparing(airbase -> airbase.getRid())).collect(Collectors.toList());
+                .sorted(Comparator.comparing(airbase -> ((AirbaseDto) airbase).getRid())).collect(Collectors.toList());
         for (AirbaseDto airbase : airbases) {
             result += "#" + airbase.getAreaId() + "-" + airbase.getRid() + " " + "[" + airbase.toActionKindString()
                     + "]" + airbase.getName()
                     + "\r\n";
             List<SquadronDto> planeInfos = airbase.getPlaneInfos().stream()
-                    .sorted(Comparator.comparing(planeInfo -> planeInfo.getSquadronId()))
+                    .sorted(Comparator.comparing(planeInfo -> ((SquadronDto) planeInfo).getSquadronId()))
                     .collect(Collectors.toList());
             AirPower airPower = new AirPower(0);
             switch (airbase.getActionKind()) {

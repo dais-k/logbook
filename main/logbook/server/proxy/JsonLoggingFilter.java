@@ -33,12 +33,12 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
 
     private static final LoggerHolder LOG = new LoggerHolder(JsonLoggingFilter.class);
 
-    private final ByteArrayOutputStream requestBodyBuffer;
-    private final ByteArrayOutputStream responseBodyBuffer;
+    private ByteArrayOutputStream requestBodyBuffer;
+    private ByteArrayOutputStream responseBodyBuffer;
     private HttpRequest request;
     private HttpResponse response;
     private boolean isHttps;
-    private final boolean isLoopback;
+    private boolean isLoopback;
 
     public JsonLoggingFilter(HttpRequest originalRequest, ChannelHandlerContext ctx) {
         super(originalRequest, ctx);
@@ -97,16 +97,16 @@ public class JsonLoggingFilter extends HttpFiltersAdapter {
                 byte[] bytes = new byte[copied.readableBytes()];
                 copied.readBytes(bytes);
                 this.responseBodyBuffer.write(bytes, 0, bytes.length);
-
-                if (httpObject instanceof LastHttpContent) {
-                    try {
-                        this.onResponseSuccess();
-                    } catch (URISyntaxException e) {
-                        LOG.get().warn("受信データ処理に失敗", e);
-                    }
-                }
             } finally {
                 copied.release();
+            }
+
+            if (httpObject instanceof LastHttpContent) {
+                try {
+                    this.onResponseSuccess();
+                } catch (URISyntaxException e) {
+                    LOG.get().warn("受信データ処理に失敗", e);
+                }
             }
         }
 

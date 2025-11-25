@@ -21,10 +21,10 @@ public class AppConstants {
     public static final String NAME = "航海日誌";
 
     /** 派生版の名前 */
-    public static final String SUFFIX = "拡張版I";
+    public static final String SUFFIX = "拡張版Mod";
 
     /** バージョン */
-    public static final String VERSION = "2.5.7.72";
+    public static final String VERSION = "2.5.7.75";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("https://github.com/Nishisonic/logbook/releases");
